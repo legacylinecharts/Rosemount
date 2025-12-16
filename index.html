@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Legacy Line Charts v1.0 - Rosemount Irish</title>
+    <title>Rosemount Irish v1.1</title>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -108,71 +108,73 @@
         );
 
         // ============================================================
-        // SUBSCRIBER CONFIGURATION - EAST GRAND FORKS GREEN WAVE
+        // SUBSCRIBER CONFIGURATION
+        // Set SUBSCRIBER_MODE = true when building subscriber sites
+        // Then populate EMBEDDED_CONFIG with their exported data
         // ============================================================
-        const SUBSCRIBER_MODE = true;
+        const SUBSCRIBER_MODE = true;  // Master site = false, Subscriber sites = true
         
         const EMBEDDED_CONFIG = {
-          siteId: 'rosemount',
+          siteId: 'rosemount-irish',
           teamSetup: {
             teamName: 'Rosemount Irish',
-            logo: 'data:image/webp;base64,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',
-            colors: { primary: '#0a1731', secondary: '#ca9f02' },
+            logo: 'data:image/webp;base64,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',
+            colors: { primary: '#0c1d39', secondary: '#b89105' },
             arena: 'Rosemount Ice Arena, Rosemount',
+            careerStats: {
+              "SHERMAN_CAD": { "type": "skater", "data": { "gp": 60, "g": 33, "a": 38, "pts": 71, "pim": 12, "plusMinus": 64, "fow": 0, "fol": 0 } },
+              "TOLL_JOS": { "type": "skater", "data": { "gp": 81, "g": 23, "a": 77, "pts": 100, "pim": 24, "plusMinus": 73, "fow": 0, "fol": 0 } },
+              "GARRITY_CHR": { "type": "skater", "data": { "gp": 81, "g": 72, "a": 49, "pts": 121, "pim": 32, "plusMinus": 70, "fow": 0, "fol": 0 } },
+              "MCNEIL_GAV": { "type": "skater", "data": { "gp": 54, "g": 23, "a": 36, "pts": 59, "pim": 8, "plusMinus": 43, "fow": 0, "fol": 0 } },
+              "NICHOLS_CRI": { "type": "skater", "data": { "gp": 51, "g": 7, "a": 47, "pts": 54, "pim": 24, "plusMinus": 56, "fow": 0, "fol": 0 } },
+              "RUTZICK_BEN": { "type": "skater", "data": { "gp": 77, "g": 21, "a": 31, "pts": 52, "pim": 18, "plusMinus": 30, "fow": 0, "fol": 0 } },
+              "SCHUBERT_CON": { "type": "skater", "data": { "gp": 27, "g": 12, "a": 12, "pts": 24, "pim": 18, "plusMinus": 21, "fow": 0, "fol": 0 } },
+              "CLAFTON_GRA": { "type": "skater", "data": { "gp": 54, "g": 4, "a": 28, "pts": 32, "pim": 12, "plusMinus": 41, "fow": 0, "fol": 0 } },
+              "VEDEPO_QUI": { "type": "skater", "data": { "gp": 54, "g": 14, "a": 21, "pts": 35, "pim": 60, "plusMinus": 25, "fow": 0, "fol": 0 } },
+              "GOODWIN_CHA": { "type": "skater", "data": { "gp": 27, "g": 11, "a": 8, "pts": 19, "pim": 4, "plusMinus": 13, "fow": 0, "fol": 0 } },
+              "SCHMUCKER_SAM": { "type": "skater", "data": { "gp": 28, "g": 3, "a": 13, "pts": 16, "pim": 9, "plusMinus": 16, "fow": 0, "fol": 0 } },
+              "DEGROOT_PET": { "type": "skater", "data": { "gp": 29, "g": 7, "a": 7, "pts": 14, "pim": 14, "plusMinus": 13, "fow": 0, "fol": 0 } },
+              "LENMARK_JAC": { "type": "skater", "data": { "gp": 30, "g": 3, "a": 9, "pts": 12, "pim": 29, "plusMinus": 12, "fow": 0, "fol": 0 } },
+              "GOREN_OLI": { "type": "skater", "data": { "gp": 23, "g": 0, "a": 9, "pts": 9, "pim": 14, "plusMinus": 12, "fow": 0, "fol": 0 } },
+              "GANSER_CAR": { "type": "skater", "data": { "gp": 37, "g": 3, "a": 9, "pts": 12, "pim": 14, "plusMinus": 30, "fow": 0, "fol": 0 } },
+              "MCCRACKEN_BRA": { "type": "skater", "data": { "gp": 33, "g": 3, "a": 3, "pts": 6, "pim": 2, "plusMinus": -2, "fow": 0, "fol": 0 } },
+              "HENDERSON_MAS": { "type": "skater", "data": { "gp": 15, "g": 1, "a": 1, "pts": 2, "pim": 0, "plusMinus": -1, "fow": 0, "fol": 0 } },
+              "CLEMENTS_SAM": { "type": "goalie", "data": { "gp": 26, "min": "1315:28", "w": 22, "l": 4, "t": 0, "so": 4, "ga": 61, "sv": 499 } },
+              "GROVE_ZAC": { "type": "skater", "data": { "gp": 5, "g": 0, "a": 1, "pts": 1, "pim": 0, "plusMinus": 2, "fow": 0, "fol": 0 } },
+              "CAMPBELL_CAR": { "type": "skater", "data": { "gp": 2, "g": 0, "a": 1, "pts": 1, "pim": 2, "plusMinus": -2, "fow": 0, "fol": 0 } },
+              "ERICKSON_HEA": { "type": "skater", "data": { "gp": 15, "g": 0, "a": 0, "pts": 0, "pim": 0, "plusMinus": -1, "fow": 0, "fol": 0 } },
+              "ATKINS_BRO": { "type": "skater", "data": { "gp": 1, "g": 0, "a": 0, "pts": 0, "pim": 0, "plusMinus": -1, "fow": 0, "fol": 0 } },
+              "LEBRUN_GAV": { "type": "skater", "data": { "gp": 1, "g": 0, "a": 0, "pts": 0, "pim": 0, "plusMinus": 0, "fow": 0, "fol": 0 } },
+              "TOBIAS_COO": { "type": "skater", "data": { "gp": 3, "g": 0, "a": 0, "pts": 0, "pim": 0, "plusMinus": 0, "fow": 0, "fol": 0 } },
+              "PACE_BEN": { "type": "skater", "data": { "gp": 1, "g": 0, "a": 0, "pts": 0, "pim": 0, "plusMinus": 0, "fow": 0, "fol": 0 } },
+              "MCDONALD_MAS": { "type": "skater", "data": { "gp": 1, "g": 0, "a": 0, "pts": 0, "pim": 0, "plusMinus": 0, "fow": 0, "fol": 0 } },
+              "WILLIAMS_MAX": { "type": "skater", "data": { "gp": 1, "g": 0, "a": 0, "pts": 0, "pim": 0, "plusMinus": 0, "fow": 0, "fol": 0 } },
+              "PEDERSEN_CHA": { "type": "goalie", "data": { "gp": 2, "min": "59:01", "w": 1, "l": 0, "t": 0, "so": 1, "ga": 1, "sv": 21 } },
+              "HEDLUND_HAN": { "type": "skater", "data": { "gp": 28, "g": 17, "a": 33, "pts": 50, "pim": 49, "plusMinus": 37, "fow": 0, "fol": 0 } },
+              "DURIGAN_OWE": { "type": "skater", "data": { "gp": 52, "g": 19, "a": 29, "pts": 48, "pim": 20, "plusMinus": 28, "fow": 0, "fol": 0 } },
+              "SALAK_LUC": { "type": "skater", "data": { "gp": 54, "g": 13, "a": 18, "pts": 31, "pim": 30, "plusMinus": -1, "fow": 0, "fol": 0 } },
+              "HANSEN_TY": { "type": "skater", "data": { "gp": 53, "g": 12, "a": 21, "pts": 33, "pim": 65, "plusMinus": 4, "fow": 0, "fol": 0 } },
+              "LOTYSZ_KAD": { "type": "skater", "data": { "gp": 54, "g": 9, "a": 15, "pts": 24, "pim": 60, "plusMinus": 17, "fow": 0, "fol": 0 } },
+              "GANSER_JAC": { "type": "skater", "data": { "gp": 53, "g": 11, "a": 21, "pts": 32, "pim": 38, "plusMinus": 11, "fow": 0, "fol": 0 } },
+              "LEWIS_ELI": { "type": "skater", "data": { "gp": 48, "g": 6, "a": 14, "pts": 20, "pim": 35, "plusMinus": 13, "fow": 0, "fol": 0 } },
+              "RETKA_BUR": { "type": "skater", "data": { "gp": 50, "g": 4, "a": 7, "pts": 11, "pim": 30, "plusMinus": 11, "fow": 0, "fol": 0 } },
+              "CARLSON_MIC": { "type": "skater", "data": { "gp": 31, "g": 3, "a": 1, "pts": 4, "pim": 4, "plusMinus": 3, "fow": 0, "fol": 0 } },
+              "NELSON_TRE": { "type": "goalie", "data": { "gp": 23, "min": "1100:55", "w": 16, "l": 5, "t": 0, "so": 2, "ga": 44, "sv": 413 } },
+              "MCNAMARA_KEV": { "type": "skater", "data": { "gp": 1, "g": 0, "a": 1, "pts": 1, "pim": 0, "plusMinus": 1, "fow": 0, "fol": 0 } },
+              "HEROLD_DYL": { "type": "skater", "data": { "gp": 21, "g": 2, "a": 1, "pts": 3, "pim": 2, "plusMinus": 2, "fow": 0, "fol": 0 } },
+              "SIMONSON_BEA": { "type": "skater", "data": { "gp": 1, "g": 0, "a": 0, "pts": 0, "pim": 0, "plusMinus": 0, "fow": 0, "fol": 0 } },
+              "DENNY_CAD": { "type": "goalie", "data": { "gp": 19, "min": "883:09", "w": 9, "l": 9, "t": 0, "so": 3, "ga": 53, "sv": 306 } },
+              "HEGARTY_CAD": { "type": "skater", "data": { "gp": 27, "g": 10, "a": 34, "pts": 44, "pim": 4, "plusMinus": 15, "fow": 0, "fol": 0 } },
+              "CAMPBELL_CAD": { "type": "skater", "data": { "gp": 27, "g": 18, "a": 24, "pts": 42, "pim": 22, "plusMinus": 8, "fow": 0, "fol": 0 } },
+              "TOLL_JAK": { "type": "skater", "data": { "gp": 27, "g": 12, "a": 19, "pts": 31, "pim": 35, "plusMinus": 14, "fow": 0, "fol": 0 } },
+              "SABO_RYK": { "type": "skater", "data": { "gp": 27, "g": 0, "a": 5, "pts": 5, "pim": 8, "plusMinus": 11, "fow": 0, "fol": 0 } },
+              "FISCHER_TRI": { "type": "goalie", "data": { "gp": 16, "min": "771:45", "w": 8, "l": 6, "t": 1, "so": 1, "ga": 45, "sv": 362 } },
+              "CLEMENTS_AID": { "type": "skater", "data": { "gp": 26, "g": 1, "a": 0, "pts": 1, "pim": 18, "plusMinus": -5, "fow": 0, "fol": 0 } },
+              "KELSEY_TJ": { "type": "skater", "data": { "gp": 6, "g": 0, "a": 0, "pts": 0, "pim": 0, "plusMinus": -1, "fow": 0, "fol": 0 } },
+              "BARTOL_GRA": { "type": "skater", "data": { "gp": 3, "g": 0, "a": 0, "pts": 0, "pim": 0, "plusMinus": 0, "fow": 0, "fol": 0 } },
+              "PARLA_LUC": { "type": "skater", "data": { "gp": 1, "g": 0, "a": 0, "pts": 0, "pim": 0, "plusMinus": 0, "fow": 0, "fol": 0 } }
+            },
             pronunciations: {}
-          },
-          careerStats: {
-            "SHERMAN_CAD": { "type": "skater", "data": { "gp": 60, "g": 33, "a": 38, "pts": 71, "pim": 12, "plusMinus": 64, "fow": 0, "fol": 0 } },
-            "TOLL_JOS": { "type": "skater", "data": { "gp": 81, "g": 23, "a": 77, "pts": 100, "pim": 24, "plusMinus": 73, "fow": 0, "fol": 0 } },
-            "GARRITY_CHR": { "type": "skater", "data": { "gp": 81, "g": 72, "a": 49, "pts": 121, "pim": 32, "plusMinus": 70, "fow": 0, "fol": 0 } },
-            "MCNEIL_GAV": { "type": "skater", "data": { "gp": 54, "g": 23, "a": 36, "pts": 59, "pim": 8, "plusMinus": 43, "fow": 0, "fol": 0 } },
-            "NICHOLS_CRI": { "type": "skater", "data": { "gp": 51, "g": 7, "a": 47, "pts": 54, "pim": 24, "plusMinus": 56, "fow": 0, "fol": 0 } },
-            "RUTZICK_BEN": { "type": "skater", "data": { "gp": 77, "g": 21, "a": 31, "pts": 52, "pim": 18, "plusMinus": 30, "fow": 0, "fol": 0 } },
-            "SCHUBERT_CON": { "type": "skater", "data": { "gp": 27, "g": 12, "a": 12, "pts": 24, "pim": 18, "plusMinus": 21, "fow": 0, "fol": 0 } },
-            "CLAFTON_GRA": { "type": "skater", "data": { "gp": 54, "g": 4, "a": 28, "pts": 32, "pim": 12, "plusMinus": 41, "fow": 0, "fol": 0 } },
-            "VEDEPO_QUI": { "type": "skater", "data": { "gp": 54, "g": 14, "a": 21, "pts": 35, "pim": 60, "plusMinus": 25, "fow": 0, "fol": 0 } },
-            "GOODWIN_CHA": { "type": "skater", "data": { "gp": 27, "g": 11, "a": 8, "pts": 19, "pim": 4, "plusMinus": 13, "fow": 0, "fol": 0 } },
-            "SCHMUCKER_SAM": { "type": "skater", "data": { "gp": 28, "g": 3, "a": 13, "pts": 16, "pim": 9, "plusMinus": 16, "fow": 0, "fol": 0 } },
-            "DEGROOT_PET": { "type": "skater", "data": { "gp": 29, "g": 7, "a": 7, "pts": 14, "pim": 14, "plusMinus": 13, "fow": 0, "fol": 0 } },
-            "LENMARK_JAC": { "type": "skater", "data": { "gp": 30, "g": 3, "a": 9, "pts": 12, "pim": 29, "plusMinus": 12, "fow": 0, "fol": 0 } },
-            "GOREN_OLI": { "type": "skater", "data": { "gp": 23, "g": 0, "a": 9, "pts": 9, "pim": 14, "plusMinus": 12, "fow": 0, "fol": 0 } },
-            "GANSER_CAR": { "type": "skater", "data": { "gp": 37, "g": 3, "a": 9, "pts": 12, "pim": 14, "plusMinus": 30, "fow": 0, "fol": 0 } },
-            "MCCRACKEN_BRA": { "type": "skater", "data": { "gp": 33, "g": 3, "a": 3, "pts": 6, "pim": 2, "plusMinus": -2, "fow": 0, "fol": 0 } },
-            "HENDERSON_MAS": { "type": "skater", "data": { "gp": 15, "g": 1, "a": 1, "pts": 2, "pim": 0, "plusMinus": -1, "fow": 0, "fol": 0 } },
-            "CLEMENTS_SAM": { "type": "goalie", "data": { "gp": 26, "min": "1315:28", "w": 22, "l": 4, "t": 0, "so": 4, "ga": 61, "sv": 499 } },
-            "GROVE_ZAC": { "type": "skater", "data": { "gp": 5, "g": 0, "a": 1, "pts": 1, "pim": 0, "plusMinus": 2, "fow": 0, "fol": 0 } },
-            "CAMPBELL_CAR": { "type": "skater", "data": { "gp": 2, "g": 0, "a": 1, "pts": 1, "pim": 2, "plusMinus": -2, "fow": 0, "fol": 0 } },
-            "ERICKSON_HEA": { "type": "skater", "data": { "gp": 15, "g": 0, "a": 0, "pts": 0, "pim": 0, "plusMinus": -1, "fow": 0, "fol": 0 } },
-            "ATKINS_BRO": { "type": "skater", "data": { "gp": 1, "g": 0, "a": 0, "pts": 0, "pim": 0, "plusMinus": -1, "fow": 0, "fol": 0 } },
-            "LEBRUN_GAV": { "type": "skater", "data": { "gp": 1, "g": 0, "a": 0, "pts": 0, "pim": 0, "plusMinus": 0, "fow": 0, "fol": 0 } },
-            "TOBIAS_COO": { "type": "skater", "data": { "gp": 3, "g": 0, "a": 0, "pts": 0, "pim": 0, "plusMinus": 0, "fow": 0, "fol": 0 } },
-            "PACE_BEN": { "type": "skater", "data": { "gp": 1, "g": 0, "a": 0, "pts": 0, "pim": 0, "plusMinus": 0, "fow": 0, "fol": 0 } },
-            "MCDONALD_MAS": { "type": "skater", "data": { "gp": 1, "g": 0, "a": 0, "pts": 0, "pim": 0, "plusMinus": 0, "fow": 0, "fol": 0 } },
-            "WILLIAMS_MAX": { "type": "skater", "data": { "gp": 1, "g": 0, "a": 0, "pts": 0, "pim": 0, "plusMinus": 0, "fow": 0, "fol": 0 } },
-            "PEDERSEN_CHA": { "type": "goalie", "data": { "gp": 2, "min": "59:01", "w": 1, "l": 0, "t": 0, "so": 1, "ga": 1, "sv": 21 } },
-            "HEDLUND_HAN": { "type": "skater", "data": { "gp": 28, "g": 17, "a": 33, "pts": 50, "pim": 49, "plusMinus": 37, "fow": 0, "fol": 0 } },
-            "DURIGAN_OWE": { "type": "skater", "data": { "gp": 52, "g": 19, "a": 29, "pts": 48, "pim": 20, "plusMinus": 28, "fow": 0, "fol": 0 } },
-            "SALAK_LUC": { "type": "skater", "data": { "gp": 54, "g": 13, "a": 18, "pts": 31, "pim": 30, "plusMinus": -1, "fow": 0, "fol": 0 } },
-            "HANSEN_TY": { "type": "skater", "data": { "gp": 53, "g": 12, "a": 21, "pts": 33, "pim": 65, "plusMinus": 4, "fow": 0, "fol": 0 } },
-            "LOTYSZ_KAD": { "type": "skater", "data": { "gp": 54, "g": 9, "a": 15, "pts": 24, "pim": 60, "plusMinus": 17, "fow": 0, "fol": 0 } },
-            "GANSER_JAC": { "type": "skater", "data": { "gp": 53, "g": 11, "a": 21, "pts": 32, "pim": 38, "plusMinus": 11, "fow": 0, "fol": 0 } },
-            "LEWIS_ELI": { "type": "skater", "data": { "gp": 48, "g": 6, "a": 14, "pts": 20, "pim": 35, "plusMinus": 13, "fow": 0, "fol": 0 } },
-            "RETKA_BUR": { "type": "skater", "data": { "gp": 50, "g": 4, "a": 7, "pts": 11, "pim": 30, "plusMinus": 11, "fow": 0, "fol": 0 } },
-            "CARLSON_MIC": { "type": "skater", "data": { "gp": 31, "g": 3, "a": 1, "pts": 4, "pim": 4, "plusMinus": 3, "fow": 0, "fol": 0 } },
-            "NELSON_TRE": { "type": "goalie", "data": { "gp": 23, "min": "1100:55", "w": 16, "l": 5, "t": 0, "so": 2, "ga": 44, "sv": 413 } },
-            "MCNAMARA_KEV": { "type": "skater", "data": { "gp": 1, "g": 0, "a": 1, "pts": 1, "pim": 0, "plusMinus": 1, "fow": 0, "fol": 0 } },
-            "HEROLD_DYL": { "type": "skater", "data": { "gp": 21, "g": 2, "a": 1, "pts": 3, "pim": 2, "plusMinus": 2, "fow": 0, "fol": 0 } },
-            "SIMONSON_BEA": { "type": "skater", "data": { "gp": 1, "g": 0, "a": 0, "pts": 0, "pim": 0, "plusMinus": 0, "fow": 0, "fol": 0 } },
-            "DENNY_CAD": { "type": "goalie", "data": { "gp": 19, "min": "883:09", "w": 9, "l": 9, "t": 0, "so": 3, "ga": 53, "sv": 306 } },
-            "HEGARTY_CAD": { "type": "skater", "data": { "gp": 27, "g": 10, "a": 34, "pts": 44, "pim": 4, "plusMinus": 15, "fow": 0, "fol": 0 } },
-            "CAMPBELL_CAD": { "type": "skater", "data": { "gp": 27, "g": 18, "a": 24, "pts": 42, "pim": 22, "plusMinus": 8, "fow": 0, "fol": 0 } },
-            "TOLL_JAK": { "type": "skater", "data": { "gp": 27, "g": 12, "a": 19, "pts": 31, "pim": 35, "plusMinus": 14, "fow": 0, "fol": 0 } },
-            "SABO_RYK": { "type": "skater", "data": { "gp": 27, "g": 0, "a": 5, "pts": 5, "pim": 8, "plusMinus": 11, "fow": 0, "fol": 0 } },
-            "FISCHER_TRI": { "type": "goalie", "data": { "gp": 16, "min": "771:45", "w": 8, "l": 6, "t": 1, "so": 1, "ga": 45, "sv": 362 } },
-            "CLEMENTS_AID": { "type": "skater", "data": { "gp": 26, "g": 1, "a": 0, "pts": 1, "pim": 18, "plusMinus": -5, "fow": 0, "fol": 0 } },
-            "KELSEY_TJ": { "type": "skater", "data": { "gp": 6, "g": 0, "a": 0, "pts": 0, "pim": 0, "plusMinus": -1, "fow": 0, "fol": 0 } },
-            "BARTOL_GRA": { "type": "skater", "data": { "gp": 3, "g": 0, "a": 0, "pts": 0, "pim": 0, "plusMinus": 0, "fow": 0, "fol": 0 } },
-            "PARLA_LUC": { "type": "skater", "data": { "gp": 1, "g": 0, "a": 0, "pts": 0, "pim": 0, "plusMinus": 0, "fow": 0, "fol": 0 } }
           },
           careerSeasonData: { season1: '', season2: '', season3: '' }
         };
@@ -190,7 +192,7 @@
               teamName: 'Delano Tigers',
               logo: null,
               colors: { primary: '#fb923c', secondary: '#1f2937' },
-              arena: 'Delano Area Sports Arena, Delano',
+              arena: '',
               careerStats: {},
               pronunciations: {},
               careerSeasonData: {
@@ -460,14 +462,19 @@
             const exportObj = {
               _exportInfo: {
                 exportDate: new Date().toISOString(),
-                version: '10.5',
+                version: '11.6',
                 teamName: myTeamSetup.teamName,
                 description: 'Full team configuration for subscriber site build'
               },
               myTeamSetup: {
-                ...myTeamSetup,
-                // Include career stats from localStorage
-                careerStats: storedCareerStats
+                teamName: myTeamSetup.teamName,
+                logo: myTeamSetup.logo,
+                colors: myTeamSetup.colors,
+                arena: myTeamSetup.arena,
+                // Career stats from localStorage (not from myTeamSetup)
+                careerStats: storedCareerStats,
+                // Pronunciations always empty for subscribers - they add their own
+                pronunciations: {}
               },
               // Include raw career season paste data
               careerSeasonData: {
@@ -898,6 +905,8 @@
                       const dateMatch = fullLine.match(/^([A-Za-z]{3}\s+[A-Za-z]{3}\s+\d{1,2},?\s+\d{4}\s*@\s*\d{1,2}:\d{2}[ap]?m?)/i);
                       if (dateMatch) {
                         date = dateMatch[1];
+                        // Normalize time format: 7:00p -> 7:00pm
+                        date = date.replace(/(\d:\d{2})([ap])(?!m)/i, '$1$2m');
                       } else {
                         // Fallback - just take up to the time
                         const parts = fullLine.split(/\s+(?=[A-Z][a-z]+\s+[A-Z])/);
@@ -942,7 +951,8 @@
                     if (line.includes('@') && line.match(/\d{1,2}:\d{2}/)) {
                       const parts = line.split('@');
                       date = parts[0]?.trim() || '';
-                      time = parts[1]?.trim() || '';
+                      // Normalize time format: 7:00p -> 7:00pm
+                      time = (parts[1]?.trim() || '').replace(/(\d:\d{2})([ap])(?!m)/i, '$1$2m');
                     }
                     
                     // Location line - typically follows the date/time and contains arena name
@@ -3037,52 +3047,28 @@
                     </div>
                   </div>
 
-                  {/* C4 (24%) - CENTER: TEAM NAMES GRID + GAME INFO */}
-                  <div className="flex flex-col justify-between">
-                    <div className="bg-gray-100 rounded p-1 mb-0">
-                      <div className="flex gap-1" style={{ height: '70px' }}>
-                        <div className="grid gap-0" style={{ 
-                          gridTemplateColumns: 'repeat(3, 1fr)',
-                          gridTemplateRows: 'repeat(4, 1fr)',
-                          flex: '3'
-                        }}>
-                          {[...Array(12)].map((_, i) => (
-                            <div key={`left-${i}`} className="bg-white border border-gray-300"></div>
-                          ))}
-                        </div>
-                        <div style={{ width: '0.5fr' }}></div>
-                        <div className="grid gap-0" style={{ 
-                          gridTemplateColumns: 'repeat(2, 1fr)',
-                          gridTemplateRows: 'repeat(4, 1fr)',
-                          flex: '2'
-                        }}>
-                          {[...Array(8)].map((_, i) => (
-                            <div key={`right-${i}`} className="bg-white border border-gray-300"></div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex-1 flex flex-col items-center justify-end text-center" style={{ paddingBottom: '4px' }}>
-                      <div style={{ fontSize: 'clamp(14px, 1.8vw, 20px)', color: myTeamSetup.colors.primary }} className="font-black leading-tight">
+                  {/* C4 (24%) - CENTER: TEAM NAMES + GAME INFO */}
+                  <div className="flex flex-col justify-center">
+                    <div className="flex-1 flex flex-col items-center justify-center text-center">
+                      <div style={{ fontSize: 'clamp(17px, 2.2vw, 24px)', color: myTeamSetup.colors.primary }} className="font-black leading-tight">
                         {myTeamSetup.teamName}
                       </div>
-                      <div style={{ fontSize: 'clamp(7px, 0.8vw, 9px)' }} className="text-gray-700">
+                      <div style={{ fontSize: 'clamp(11px, 1.4vw, 15px)' }} className="text-gray-600">
                         ({myTeamData.record.w}-{myTeamData.record.l}-{myTeamData.record.t}, {myTeamData.section}, {myTeamData.conference})
                       </div>
                       
                       <div style={{ fontSize: 'clamp(10px, 1.3vw, 14px)', padding: '1px 0' }} className="font-semibold text-gray-600">vs</div>
                       
-                      <div style={{ fontSize: 'clamp(14px, 1.8vw, 20px)', color: opponentColors.primary }} className="font-black leading-tight">
+                      <div style={{ fontSize: 'clamp(17px, 2.2vw, 24px)', color: opponentColors.primary }} className="font-black leading-tight">
                         {opponentData.teamName} {opponentData.nickname}
                       </div>
-                      <div style={{ fontSize: 'clamp(7px, 0.8vw, 9px)' }} className="text-gray-700">
+                      <div style={{ fontSize: 'clamp(11px, 1.4vw, 15px)' }} className="text-gray-600">
                         ({opponentData.record.w}-{opponentData.record.l}-{opponentData.record.t}, {opponentData.section}, {opponentData.conference})
                       </div>
                       
                       <div style={{ fontSize: 'clamp(11px, 1.4vw, 15px)', fontWeight: '800', marginTop: '2px' }} className="text-gray-600">Game #{(myTeamData.record.w + myTeamData.record.l + myTeamData.record.t + 1)}</div>
                       {myTeamData.currentGame && myTeamData.currentGame.date && (
-                        <div style={{ fontSize: 'clamp(7px, 0.8vw, 9px)' }} className="text-gray-700">
+                        <div style={{ fontSize: 'clamp(11px, 1.4vw, 15px)' }} className="text-gray-600">
                           {myTeamData.currentGame.date}{myTeamData.currentGame.time ? ` @ ${myTeamData.currentGame.time}` : ''}
                           {myTeamData.currentGame.location ? ` at ${myTeamData.currentGame.location}` : ''}
                         </div>
