@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rosemount Irish v1.1</title>
+    <title>Rosemount Irish v1.2</title>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -855,7 +855,7 @@
                       const line = lines[i];
                       // Match lines that have a team name followed by period scores (numbers separated by tabs/spaces)
                       // e.g., "Rosemount	1	2	1	4" or " Park of Cottage Grove	0	2	0	2"
-                      const tableMatch = line.match(/^\s*([A-Za-z][A-Za-z\s\/\-\.of]+?)\s+\d+\s+\d+/);
+                      const tableMatch = line.match(/^\s*([A-Za-z][A-Za-z\s\/\-\.of']+?)\s+\d+\s+\d+/);
                       if (tableMatch) {
                         const foundTeam = tableMatch[1].trim();
                         // Check if this is our team or opponent
@@ -3399,7 +3399,7 @@
                               {forwards.map((player, idx) => (
                                 <tr key={player.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                                   <td className="border font-bold text-center" style={{ padding }}>{player.number}</td>
-                                  <td className="border" style={{ padding, maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{player.firstName} {player.lastName}</td>
+                                  <td className="border" style={{ padding, maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{player.firstName} {player.lastName}{player.shoots ? ` (${player.shoots})` : ''}</td>
                                   <td className="border text-center" style={{ padding }}>{convertGradeToText(player.grade)}</td>
                                   <td className="border text-center" style={{ padding }}>{player.stats.gp}</td>
                                   <td className="border text-center" style={{ padding, backgroundColor: isMaxStat(player.stats.g, fwdMaxStats.g) ? '#FFFF00' : 'transparent' }}>{player.stats.g}</td>
@@ -3445,7 +3445,7 @@
                               {defense.map((player, idx) => (
                                 <tr key={player.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                                   <td className="border font-bold text-center" style={{ padding }}>{player.number}</td>
-                                  <td className="border" style={{ padding, maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{player.firstName} {player.lastName}</td>
+                                  <td className="border" style={{ padding, maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{player.firstName} {player.lastName}{player.shoots ? ` (${player.shoots})` : ''}</td>
                                   <td className="border text-center" style={{ padding }}>{convertGradeToText(player.grade)}</td>
                                   <td className="border text-center" style={{ padding }}>{player.stats.gp}</td>
                                   <td className="border text-center" style={{ padding, backgroundColor: isMaxStat(player.stats.g, defMaxStats.g) ? '#FFFF00' : 'transparent' }}>{player.stats.g}</td>
