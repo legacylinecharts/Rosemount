@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rosemount Irish v2.1</title>
+    <title>Rosemount Irish v2.2</title>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -383,7 +383,7 @@
               teamName: 'Rosemount Irish',
               logo: null,
               colors: { primary: '#00A302', secondary: '#000066' },
-              arena: '',
+              arena: 'Rosemount Ice Arena, Rosemount',
               careerStats: {},
               pronunciations: {},
               careerSeasonData: {
@@ -577,9 +577,9 @@
               console.log('🏒 SUBSCRIBER MODE: Initializing from embedded config');
               
               // Initialize career stats in localStorage from embedded config
-              if (EMBEDDED_CONFIG.careerStats && Object.keys(EMBEDDED_CONFIG.careerStats).length > 0) {
-                localStorage.setItem('hockey-scout-career-stats', JSON.stringify(EMBEDDED_CONFIG.careerStats));
-                console.log('📦 Loaded', Object.keys(EMBEDDED_CONFIG.careerStats).length, 'embedded career stat records');
+              if (EMBEDDED_CONFIG.teamSetup?.careerStats && Object.keys(EMBEDDED_CONFIG.teamSetup?.careerStats).length > 0) {
+                localStorage.setItem('hockey-scout-career-stats', JSON.stringify(EMBEDDED_CONFIG.teamSetup?.careerStats));
+                console.log('📦 Loaded', Object.keys(EMBEDDED_CONFIG.teamSetup?.careerStats).length, 'embedded career stat records');
               }
               
               // Don't override myTeamSetup from localStorage in subscriber mode
