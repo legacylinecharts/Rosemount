@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rosemount Irish v3.0</title>
+    <title>Rosemount Irish v3.1</title>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -397,21 +397,35 @@
           
           const [myTeamSetup, setMyTeamSetup] = useState(getInitialTeamSetup);
 
-          const [myTeamData, setMyTeamData] = useState({
-            teamName: '',
-            nickname: '',
-            record: { w: 0, l: 0, t: 0 },
-            section: '2A',
-            conference: 'WCC',
-            stats: { ppPct: 0, pkPct: 0, gpg: 0, gapg: 0 },
-            roster: [],
-            nextGame: { gameNum: '', opponent: '', date: '', location: '', oppRecord: '', oppSection: '', oppConference: '' },
-            currentGame: { gameNum: '', opponent: '', date: '', time: '', location: '', isHome: false },
-            headCoach: { name: '', careerRecord: { w: 0, l: 0, t: 0 }, seasonRecord: { w: 0, l: 0, t: 0 } },
-            assistantCoaches: [],
-            studentManager: '',
-            injuries: []
-          });
+          // Initialize myTeamData from localStorage
+          const getInitialMyTeamData = () => {
+            try {
+              const saved = localStorage.getItem('hockey-scout-myTeamData');
+              if (saved) {
+                console.log('📋 Loading saved myTeamData from localStorage');
+                return JSON.parse(saved);
+              }
+            } catch (error) {
+              console.error('Error loading saved myTeamData:', error);
+            }
+            return {
+              teamName: '',
+              nickname: '',
+              record: { w: 0, l: 0, t: 0 },
+              section: '2A',
+              conference: 'WCC',
+              stats: { ppPct: 0, pkPct: 0, gpg: 0, gapg: 0 },
+              roster: [],
+              nextGame: { gameNum: '', opponent: '', date: '', location: '', oppRecord: '', oppSection: '', oppConference: '' },
+              currentGame: { gameNum: '', opponent: '', date: '', time: '', location: '', isHome: false },
+              headCoach: { name: '', careerRecord: { w: 0, l: 0, t: 0 }, seasonRecord: { w: 0, l: 0, t: 0 } },
+              assistantCoaches: [],
+              studentManager: '',
+              injuries: []
+            };
+          };
+
+          const [myTeamData, setMyTeamData] = useState(getInitialMyTeamData);
 
           const [opponentData, setOpponentData] = useState({
             teamName: '',
@@ -425,16 +439,30 @@
             assistantCoaches: []
           });
 
-          const [lines, setLines] = useState({
-            line1: { lw: null, c: null, rw: null, color: 'GREEN' },
-            line2: { lw: null, c: null, rw: null, color: 'RED' },
-            line3: { lw: null, c: null, rw: null, color: 'BLUE' },
-            line4: { lw: null, c: null, rw: null, color: 'YELLOW' },
-            d1: { ld: null, rd: null },
-            d2: { ld: null, rd: null },
-            d3: { ld: null, rd: null },
-            goalies: { starter: null, backup: null }
-          });
+          // Initialize lines from localStorage
+          const getInitialLines = () => {
+            try {
+              const saved = localStorage.getItem('hockey-scout-lines');
+              if (saved) {
+                console.log('📋 Loading saved line assignments from localStorage');
+                return JSON.parse(saved);
+              }
+            } catch (error) {
+              console.error('Error loading saved lines:', error);
+            }
+            return {
+              line1: { lw: null, c: null, rw: null, color: 'GREEN' },
+              line2: { lw: null, c: null, rw: null, color: 'RED' },
+              line3: { lw: null, c: null, rw: null, color: 'BLUE' },
+              line4: { lw: null, c: null, rw: null, color: 'YELLOW' },
+              d1: { ld: null, rd: null, color: 'GREEN' },
+              d2: { ld: null, rd: null, color: 'RED' },
+              d3: { ld: null, rd: null, color: 'BLUE' },
+              goalies: { starter: null, starterColor: 'YELLOW', backup: null, backupColor: 'WHITE' }
+            };
+          };
+
+          const [lines, setLines] = useState(getInitialLines);
 
           const [coachNotes, setCoachNotes] = useState({
             pk: '',
@@ -479,7 +507,7 @@
             };
           });
 
-          const colorOptions = ['GREEN', 'RED', 'BLUE', 'YELLOW', 'WHITE', 'BLACK', 'DARK GRAY', 'LIGHT GRAY'];
+          const colorOptions = ['GREEN', 'RED', 'BLUE', 'YELLOW', 'WHITE', 'BLACK', 'DARK GRAY', 'LIGHT GRAY', 'BURNT ORANGE', 'DEEP PURPLE', 'MAROON', 'NAVY', 'GOLD'];
           const colorClasses = {
             'GREEN': 'bg-green-100 border-green-600',
             'RED': 'bg-red-100 border-red-600',
@@ -488,7 +516,12 @@
             'WHITE': 'bg-white border-gray-800',
             'BLACK': 'bg-gray-900 border-gray-900',
             'DARK GRAY': 'bg-gray-600 border-gray-800',
-            'LIGHT GRAY': 'bg-gray-200 border-gray-500'
+            'LIGHT GRAY': 'bg-gray-200 border-gray-500',
+            'BURNT ORANGE': 'bg-orange-200 border-orange-700',
+            'DEEP PURPLE': 'bg-purple-200 border-purple-700',
+            'MAROON': 'bg-red-200 border-red-900',
+            'NAVY': 'bg-blue-200 border-blue-900',
+            'GOLD': 'bg-yellow-200 border-yellow-700'
           };
 
           const importSteps = [
@@ -607,6 +640,26 @@
             }
           }, [myTeamSetup]);
 
+          // Save lines to localStorage whenever they change
+          useEffect(() => {
+            try {
+              localStorage.setItem('hockey-scout-lines', JSON.stringify(lines));
+              console.log('💾 Saved line assignments to localStorage');
+            } catch (error) {
+              console.error('Error saving lines:', error);
+            }
+          }, [lines]);
+
+          // Save myTeamData to localStorage whenever it changes
+          useEffect(() => {
+            try {
+              localStorage.setItem('hockey-scout-myTeamData', JSON.stringify(myTeamData));
+              console.log('💾 Saved myTeamData to localStorage');
+            } catch (error) {
+              console.error('Error saving myTeamData:', error);
+            }
+          }, [myTeamData]);
+
           // Helper Functions
           const openHelp = (type, season = '') => {
             let content = { ...helpContents[type] };
@@ -615,6 +668,44 @@
             }
             setHelpContent(content);
             setShowHelp(true);
+          };
+
+          // Sync line assignments with updated roster - update stats, remove missing players
+          const syncLinesWithRoster = (newRoster) => {
+            console.log('🔄 Syncing line assignments with updated roster...');
+            const rosterIds = new Set(newRoster.map(p => p.id));
+            
+            setLines(prevLines => {
+              const updatedLines = { ...prevLines };
+              let removedCount = 0;
+              let updatedCount = 0;
+              
+              Object.keys(updatedLines).forEach(lineKey => {
+                const line = updatedLines[lineKey];
+                Object.keys(line).forEach(posKey => {
+                  const player = line[posKey];
+                  if (player && typeof player === 'object' && player.id) {
+                    // Check if player still exists on roster
+                    if (!rosterIds.has(player.id)) {
+                      console.log(`❌ Removing ${player.name} from ${lineKey}.${posKey} - no longer on roster`);
+                      updatedLines[lineKey] = { ...updatedLines[lineKey], [posKey]: null };
+                      removedCount++;
+                    } else {
+                      // Update player stats from new roster
+                      const updatedPlayer = newRoster.find(p => p.id === player.id);
+                      if (updatedPlayer) {
+                        console.log(`✓ Updating stats for ${player.name} in ${lineKey}.${posKey}`);
+                        updatedLines[lineKey] = { ...updatedLines[lineKey], [posKey]: updatedPlayer };
+                        updatedCount++;
+                      }
+                    }
+                  }
+                });
+              });
+              
+              console.log(`📊 Line sync complete: ${updatedCount} players updated, ${removedCount} removed`);
+              return updatedLines;
+            });
           };
 
           const getSeasonYears = () => {
@@ -653,7 +744,7 @@
             const exportObj = {
               _exportInfo: {
                 exportDate: new Date().toISOString(),
-                version: '3.0',
+                version: '3.1',
                 teamName: myTeamSetup.teamName,
                 description: 'Full team configuration for subscriber site build'
               },
@@ -1934,9 +2025,13 @@
                 let roster = parseRoster(text, myTeamData.roster);
                 roster = loadCareerStatsFromStorage(roster);
                 setMyTeamData(prev => ({ ...prev, roster }));
+                // Sync line assignments with new roster
+                syncLinesWithRoster(roster);
               } else if (importStep === 'myTeamPlayerStats') {
                 const updatedRoster = parsePlayerStats(text, myTeamData.roster);
                 setMyTeamData(prev => ({ ...prev, roster: updatedRoster }));
+                // Sync line assignments with updated stats
+                syncLinesWithRoster(updatedRoster);
               } else if (importStep === 'oppHome') {
                 const parsed = parseHomePage(text);
                 setOpponentData(prev => ({ ...prev, ...parsed }));
@@ -2001,9 +2096,11 @@
                   let roster = parseRoster(importText, myTeamData.roster);
                   roster = loadCareerStatsFromStorage(roster);
                   setMyTeamData(prev => ({ ...prev, roster }));
+                  syncLinesWithRoster(roster);
                 } else if (importStep === 'myTeamPlayerStats') {
                   const updatedRoster = parsePlayerStats(importText, myTeamData.roster);
                   setMyTeamData(prev => ({ ...prev, roster: updatedRoster }));
+                  syncLinesWithRoster(updatedRoster);
                 } else if (importStep === 'oppHome') {
                   const parsed = parseHomePage(importText);
                   setOpponentData(prev => ({ ...prev, ...parsed }));
@@ -2058,9 +2155,11 @@
                   let roster = parseRoster(importText, myTeamData.roster);
                   roster = loadCareerStatsFromStorage(roster);
                   setMyTeamData(prev => ({ ...prev, roster }));
+                  syncLinesWithRoster(roster);
                 } else if (importStep === 'myTeamPlayerStats') {
                   const updatedRoster = parsePlayerStats(importText, myTeamData.roster);
                   setMyTeamData(prev => ({ ...prev, roster: updatedRoster }));
+                  syncLinesWithRoster(updatedRoster);
                 } else if (importStep === 'oppHome') {
                   const parsed = parseHomePage(importText);
                   setOpponentData(prev => ({ ...prev, ...parsed }));
@@ -2109,6 +2208,14 @@
 
           const handleLineColorChange = (line, color) => {
             setLines({ ...lines, [line]: { ...lines[line], color } });
+          };
+
+          const handleGoalieColorChange = (position, color) => {
+            if (position === 'starter') {
+              setLines({ ...lines, goalies: { ...lines.goalies, starterColor: color } });
+            } else if (position === 'backup') {
+              setLines({ ...lines, goalies: { ...lines.goalies, backupColor: color } });
+            }
           };
 
           const convertGradeToText = (grade) => {
@@ -2868,7 +2975,7 @@
                     
                     <div className="p-6">
                       <div className="bg-purple-50 p-4 rounded mb-4">
-                        <h3 className="font-bold mb-2">📦 Subscriber Build Export v13.1</h3>
+                        <h3 className="font-bold mb-2">📦 Subscriber Build Export v13.3</h3>
                         <p className="text-sm text-gray-600 mb-2">
                           Copy this JSON configuration and send it to Claude to build a customized subscriber version. 
                         </p>
@@ -3112,6 +3219,27 @@
                     )}
                     <button onClick={() => window.print()} className="bg-green-600 text-white px-3 py-1.5 rounded hover:bg-green-700 flex items-center gap-1 text-sm font-semibold">
                       <Printer size={16} /> Print
+                    </button>
+                    <button 
+                      onClick={() => {
+                        if (confirm('Clear all line assignments? This will remove all players from lines, pairs, and goalies. Your roster will remain intact.')) {
+                          setLines({
+                            line1: { lw: null, c: null, rw: null, color: 'GREEN' },
+                            line2: { lw: null, c: null, rw: null, color: 'RED' },
+                            line3: { lw: null, c: null, rw: null, color: 'BLUE' },
+                            line4: { lw: null, c: null, rw: null, color: 'YELLOW' },
+                            d1: { ld: null, rd: null, color: 'GREEN' },
+                            d2: { ld: null, rd: null, color: 'RED' },
+                            d3: { ld: null, rd: null, color: 'BLUE' },
+                            goalies: { starter: null, starterColor: 'YELLOW', backup: null, backupColor: 'WHITE' }
+                          });
+                          console.log('🧹 Cleared all line assignments');
+                        }
+                      }} 
+                      className="bg-gray-500 text-white px-3 py-1.5 rounded hover:bg-gray-600 flex items-center gap-1 text-sm font-semibold"
+                      title="Reset all line assignments"
+                    >
+                      <X size={16} /> Clear Lines
                     </button>
                   </div>
                 </div>
@@ -3382,21 +3510,91 @@
                     <div></div>
                   </div>
 
+                  {/* D1 + Starter Goalie */}
                   <div className="grid grid-cols-3 gap-1 mb-1">
-                    <LineSlot line="d1" position="ld" label="LD" showLabel={false} />
-                    <LineSlot line="d1" position="rd" label="RD" showLabel={false} />
-                    <LineSlot line="goalies" position="starter" label="Starter" showLabel={false} />
+                    <div className={`col-span-2 rounded p-0 border-2 ${colorClasses[lines.d1.color]}`}>
+                      <div className="flex items-center gap-1">
+                        <select
+                          value={lines.d1.color}
+                          onChange={(e) => handleLineColorChange('d1', e.target.value)}
+                          className="no-print text-xs border rounded px-1"
+                        >
+                          {colorOptions.map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                        <div className="flex-1 grid grid-cols-2 gap-1">
+                          <LineSlot line="d1" position="ld" label="LD" showLabel={false} />
+                          <LineSlot line="d1" position="rd" label="RD" showLabel={false} />
+                        </div>
+                      </div>
+                    </div>
+                    <div className={`rounded p-0 border-2 ${colorClasses[lines.goalies.starterColor]}`}>
+                      <div className="flex items-center gap-1">
+                        <select
+                          value={lines.goalies.starterColor}
+                          onChange={(e) => handleGoalieColorChange('starter', e.target.value)}
+                          className="no-print text-xs border rounded px-1"
+                          style={{ width: '50px' }}
+                        >
+                          {colorOptions.map(c => <option key={c} value={c}>{c.substring(0,3)}</option>)}
+                        </select>
+                        <div className="flex-1">
+                          <LineSlot line="goalies" position="starter" label="Starter" showLabel={false} />
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
+                  {/* D2 + Backup Goalie */}
                   <div className="grid grid-cols-3 gap-1 mb-1">
-                    <LineSlot line="d2" position="ld" label="LD" showLabel={false} />
-                    <LineSlot line="d2" position="rd" label="RD" showLabel={false} />
-                    <LineSlot line="goalies" position="backup" label="Backup" showLabel={false} />
+                    <div className={`col-span-2 rounded p-0 border-2 ${colorClasses[lines.d2.color]}`}>
+                      <div className="flex items-center gap-1">
+                        <select
+                          value={lines.d2.color}
+                          onChange={(e) => handleLineColorChange('d2', e.target.value)}
+                          className="no-print text-xs border rounded px-1"
+                        >
+                          {colorOptions.map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                        <div className="flex-1 grid grid-cols-2 gap-1">
+                          <LineSlot line="d2" position="ld" label="LD" showLabel={false} />
+                          <LineSlot line="d2" position="rd" label="RD" showLabel={false} />
+                        </div>
+                      </div>
+                    </div>
+                    <div className={`rounded p-0 border-2 ${colorClasses[lines.goalies.backupColor]}`}>
+                      <div className="flex items-center gap-1">
+                        <select
+                          value={lines.goalies.backupColor}
+                          onChange={(e) => handleGoalieColorChange('backup', e.target.value)}
+                          className="no-print text-xs border rounded px-1"
+                          style={{ width: '50px' }}
+                        >
+                          {colorOptions.map(c => <option key={c} value={c}>{c.substring(0,3)}</option>)}
+                        </select>
+                        <div className="flex-1">
+                          <LineSlot line="goalies" position="backup" label="Backup" showLabel={false} />
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
+                  {/* D3 + PK/PP */}
                   <div className="grid grid-cols-3 gap-1 mb-1">
-                    <LineSlot line="d3" position="ld" label="LD" showLabel={false} />
-                    <LineSlot line="d3" position="rd" label="RD" showLabel={false} />
+                    <div className={`col-span-2 rounded p-0 border-2 ${colorClasses[lines.d3.color]}`}>
+                      <div className="flex items-center gap-1">
+                        <select
+                          value={lines.d3.color}
+                          onChange={(e) => handleLineColorChange('d3', e.target.value)}
+                          className="no-print text-xs border rounded px-1"
+                        >
+                          {colorOptions.map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                        <div className="flex-1 grid grid-cols-2 gap-1">
+                          <LineSlot line="d3" position="ld" label="LD" showLabel={false} />
+                          <LineSlot line="d3" position="rd" label="RD" showLabel={false} />
+                        </div>
+                      </div>
+                    </div>
                     <div className="grid grid-cols-2 gap-2" style={{ height: '85px' }}>
                       <div className="border-2 rounded flex flex-col" style={{ 
                         borderColor: myTeamSetup.colors.primary, 
