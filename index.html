@@ -121,7 +121,7 @@
             logo: 'https://cdn2.sportngin.com/attachments/team/f4a2-199862227/R-with-Stick-Logo_large_square.png',
             colors: { primary: '#000066', secondary: '#00A302' },
             arena: 'Rosemount Ice Arena, Rosemount',
-            careerStats: 
+            careerStats: {
               {
               "SHERMAN_CAD": { "type": "skater", "data": { "gp": 60, "g": 33, "a": 38, "pts": 71, "pim": 12, "plusMinus": 64, "fow": 0, "fol": 0 } },
               "TOLL_JOS": { "type": "skater", "data": { "gp": 81, "g": 23, "a": 77, "pts": 100, "pim": 24, "plusMinus": 73, "fow": 0, "fol": 0 } },
@@ -174,7 +174,8 @@
               "KELSEY_TJ": { "type": "skater", "data": { "gp": 6, "g": 0, "a": 0, "pts": 0, "pim": 0, "plusMinus": -1, "fow": 0, "fol": 0 } },
               "BARTOL_GRA": { "type": "skater", "data": { "gp": 3, "g": 0, "a": 0, "pts": 0, "pim": 0, "plusMinus": 0, "fow": 0, "fol": 0 } },
               "PARLA_LUC": { "type": "skater", "data": { "gp": 1, "g": 0, "a": 0, "pts": 0, "pim": 0, "plusMinus": 0, "fow": 0, "fol": 0 } }
-              },
+              }
+            },
             pronunciations: {}
           },
           careerSeasonData: { season1: '', season2: '', season3: '' }
@@ -379,7 +380,19 @@
               console.log('🏒 SUBSCRIBER MODE: Loading embedded team config');
               return EMBEDDED_CONFIG.teamSetup;
             }
-            // Default for master site (Delano)
+            
+            // Master site: try to load from localStorage first
+            try {
+              const saved = localStorage.getItem('myTeamSetup');
+              if (saved) {
+                console.log('📋 Loading saved myTeamSetup from localStorage');
+                return JSON.parse(saved);
+              }
+            } catch (error) {
+              console.error('Error loading saved myTeamSetup:', error);
+            }
+            
+            // Default for master site if nothing saved
             return {
               teamName: 'Delano Tigers',
               logo: null,
@@ -615,20 +628,8 @@
                 localStorage.setItem('hockey-scout-career-stats', JSON.stringify(EMBEDDED_CONFIG.teamSetup.careerStats));
                 console.log('📦 Loaded', Object.keys(EMBEDDED_CONFIG.teamSetup.careerStats).length, 'embedded career stat records');
               }
-              
-              // Don't override myTeamSetup from localStorage in subscriber mode
-              return;
             }
-            
-            // Master site: load from localStorage
-            try {
-              const saved = localStorage.getItem('myTeamSetup');
-              if (saved) {
-                setMyTeamSetup(JSON.parse(saved));
-              }
-            } catch (error) {
-              console.error('Error loading saved setup:', error);
-            }
+            // Note: myTeamSetup is now loaded via getInitialTeamSetup() instead of here
           }, []);
 
           // Save setup to localStorage whenever it changes
@@ -1396,7 +1397,7 @@
                   const position = fields[2];
                   const grade = fields[3];
                   
-                  if (/^\d+$/.test(number) && /^[FDG]$/.test(position) && /^\d{1,2}$/.test(grade)) {
+                  if (/^\d+$/.test(number) && (/^[FDG]$/.test(position) || position === 'D|F') && /^\d{1,2}$/.test(grade)) {
                     console.log('✓ Found player (tab-separated):', { number, name, position, grade });
                     
                     // Strip (Capt.) or (Capt) or * from names
@@ -1470,13 +1471,16 @@
                       p.firstName?.substring(0, 3)?.toUpperCase() === firstName.substring(0, 3)?.toUpperCase()
                     );
                     
+                    // Normalize D|F to D for consistency
+                    const normalizedPosition = position === 'D|F' ? 'D' : position;
+                    
                     roster.push({
                       id: `${number}-${lastName}`,
                       number: number,
                       name: cleanName,
                       firstName: firstName,
                       lastName: lastName,
-                      position: position,
+                      position: normalizedPosition,
                       grade: grade,
                       height: height,
                       weight: weight,
@@ -1484,7 +1488,7 @@
                       handed: handed,
                       shoots: shoots,
                       stats: { gp: 0, g: 0, a: 0, pts: 0, ppg: 0, ppa: 0, sh: 0, sha: 0, pim: 0, plusMinus: 0, fow: 0, fol: 0 },
-                      goalieStats: position === 'G' ? { gp: 0, min: '0:00', w: 0, l: 0, t: 0, sog: 0, ga: 0, sv: 0, gaa: 0, svp: '.000', so: 0 } : null,
+                      goalieStats: normalizedPosition === 'G' ? { gp: 0, min: '0:00', w: 0, l: 0, t: 0, sog: 0, ga: 0, sv: 0, gaa: 0, svp: '.000', so: 0 } : null,
                       baseCareerStats: existingPlayer?.baseCareerStats || undefined,
                       baseCareerGoalieStats: existingPlayer?.baseCareerGoalieStats || undefined,
                       pronunciation: existingPlayer?.pronunciation || undefined
@@ -1496,7 +1500,7 @@
                   // Example: 1Evan GeyenG126' 3"190LC2007
                   //          ^number ^name  ^pos^grade ^height^weight^shoots^year
                   
-                  const concatMatch = line.match(/^(\d+)([A-Za-z\s\-'\.]+?)([FDG])(\d{1,2})/);
+                  const concatMatch = line.match(/^(\d+)([A-Za-z\s\-'\.]+?)(D\|F|[FDG])(\d{1,2})/);
                   
                   if (concatMatch) {
                     const number = concatMatch[1];
@@ -1569,13 +1573,16 @@
                       p.firstName?.substring(0, 3)?.toUpperCase() === firstName.substring(0, 3)?.toUpperCase()
                     );
                     
+                    // Normalize D|F to D for consistency
+                    const normalizedPosition = position === 'D|F' ? 'D' : position;
+                    
                     roster.push({
                       id: `${number}-${lastName}`,
                       number: number,
                       name: cleanName,
                       firstName: firstName,
                       lastName: lastName,
-                      position: position,
+                      position: normalizedPosition,
                       grade: grade,
                       height: height,
                       weight: weight,
@@ -1583,7 +1590,7 @@
                       handed: handed,
                       shoots: shoots,
                       stats: { gp: 0, g: 0, a: 0, pts: 0, ppg: 0, ppa: 0, sh: 0, sha: 0, pim: 0, plusMinus: 0, fow: 0, fol: 0 },
-                      goalieStats: position === 'G' ? { gp: 0, min: '0:00', w: 0, l: 0, t: 0, sog: 0, ga: 0, sv: 0, gaa: 0, svp: '.000', so: 0 } : null,
+                      goalieStats: normalizedPosition === 'G' ? { gp: 0, min: '0:00', w: 0, l: 0, t: 0, sog: 0, ga: 0, sv: 0, gaa: 0, svp: '.000', so: 0 } : null,
                       baseCareerStats: existingPlayer?.baseCareerStats || undefined,
                       baseCareerGoalieStats: existingPlayer?.baseCareerGoalieStats || undefined,
                       pronunciation: existingPlayer?.pronunciation || undefined
@@ -2975,7 +2982,7 @@
                     
                     <div className="p-6">
                       <div className="bg-purple-50 p-4 rounded mb-4">
-                        <h3 className="font-bold mb-2">📦 Subscriber Build Export v13.3</h3>
+                        <h3 className="font-bold mb-2">📦 Subscriber Build Export v13.3.2</h3>
                         <p className="text-sm text-gray-600 mb-2">
                           Copy this JSON configuration and send it to Claude to build a customized subscriber version. 
                         </p>
