@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rosemount Irish v3.1</title>
+    <title>Rosemount Irish v3.7</title>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -122,7 +122,6 @@
             colors: { primary: '#000066', secondary: '#00A302' },
             arena: 'Rosemount Ice Arena, Rosemount',
             careerStats: {
-              {
               "SHERMAN_CAD": { "type": "skater", "data": { "gp": 60, "g": 33, "a": 38, "pts": 71, "pim": 12, "plusMinus": 64, "fow": 0, "fol": 0 } },
               "TOLL_JOS": { "type": "skater", "data": { "gp": 81, "g": 23, "a": 77, "pts": 100, "pim": 24, "plusMinus": 73, "fow": 0, "fol": 0 } },
               "GARRITY_CHR": { "type": "skater", "data": { "gp": 81, "g": 72, "a": 49, "pts": 121, "pim": 32, "plusMinus": 70, "fow": 0, "fol": 0 } },
@@ -174,7 +173,7 @@
               "KELSEY_TJ": { "type": "skater", "data": { "gp": 6, "g": 0, "a": 0, "pts": 0, "pim": 0, "plusMinus": -1, "fow": 0, "fol": 0 } },
               "BARTOL_GRA": { "type": "skater", "data": { "gp": 3, "g": 0, "a": 0, "pts": 0, "pim": 0, "plusMinus": 0, "fow": 0, "fol": 0 } },
               "PARLA_LUC": { "type": "skater", "data": { "gp": 1, "g": 0, "a": 0, "pts": 0, "pim": 0, "plusMinus": 0, "fow": 0, "fol": 0 } }
-              }
+              
             },
             pronunciations: {}
           },
@@ -378,7 +377,26 @@
           const getInitialTeamSetup = () => {
             if (SUBSCRIBER_MODE && EMBEDDED_CONFIG?.teamSetup) {
               console.log('🏒 SUBSCRIBER MODE: Loading embedded team config');
-              return EMBEDDED_CONFIG.teamSetup;
+              
+              // Start with embedded config for team branding
+              const baseConfig = { ...EMBEDDED_CONFIG.teamSetup };
+              
+              // Try to load pronunciations from localStorage (editable by subscriber coach)
+              try {
+                const saved = localStorage.getItem('myTeamSetup');
+                if (saved) {
+                  const savedData = JSON.parse(saved);
+                  // Merge saved pronunciations into embedded config
+                  if (savedData.pronunciations) {
+                    baseConfig.pronunciations = savedData.pronunciations;
+                    console.log('📋 Loaded saved pronunciations from localStorage');
+                  }
+                }
+              } catch (error) {
+                console.error('Error loading saved pronunciations:', error);
+              }
+              
+              return baseConfig;
             }
             
             // Master site: try to load from localStorage first
@@ -745,7 +763,7 @@
             const exportObj = {
               _exportInfo: {
                 exportDate: new Date().toISOString(),
-                version: '3.1',
+                version: '3.7',
                 teamName: myTeamSetup.teamName,
                 description: 'Full team configuration for subscriber site build'
               },
@@ -971,7 +989,8 @@
                     !potentialName.includes('Game') && 
                     !potentialName.includes('©') &&
                     !potentialName.includes('SportsEngine') &&
-                    !potentialName.includes('powered by')) {
+                    !potentialName.includes('powered by') &&
+                    potentialName !== 'Out of State') {
                   teamName = potentialName;
                   console.log('✅ Found team name:', teamName);
                 }
@@ -1138,12 +1157,33 @@
                       const line = lines[i];
                       // Match lines that have a team name followed by period scores (numbers separated by tabs/spaces)
                       // e.g., "Rosemount	1	2	1	4" or " Park of Cottage Grove	0	2	0	2"
-                      const tableMatch = line.match(/^\s*([A-Za-z][A-Za-z\s\/\-\.of']+?)\s+\d+\s+\d+/);
+                      const tableMatch = line.match(/^\s*([A-Za-z][A-Za-z\s\/\-\.of'()]+?)\s+\d+\s+\d+/);
                       if (tableMatch) {
                         const foundTeam = tableMatch[1].trim();
-                        // Check if this is our team or opponent
-                        if (foundTeam.toLowerCase().includes(teamName.toLowerCase().substring(0, 4)) ||
-                            teamName.toLowerCase().includes(foundTeam.toLowerCase().substring(0, 4))) {
+                        
+                        // More precise team matching - check if team names match at word boundaries
+                        // This prevents "Grand Forks Central" from matching "East Grand Forks"
+                        const ourTeamWords = teamName.toLowerCase().split(/\s+/);
+                        const foundTeamWords = foundTeam.toLowerCase().split(/\s+/);
+                        
+                        // Check if we have a strong match (at least one word matches exactly or starts with)
+                        const hasStrongMatch = ourTeamWords.some(ourWord => 
+                          ourWord.length >= 4 && foundTeamWords.some(foundWord => 
+                            foundWord === ourWord || 
+                            (foundWord.length >= 4 && ourWord.length >= 4 && 
+                             (foundWord.startsWith(ourWord) || ourWord.startsWith(foundWord)))
+                          )
+                        );
+                        
+                        // Additional check: first word should match for strong confidence
+                        const firstWordMatches = ourTeamWords[0] && foundTeamWords[0] && 
+                          (ourTeamWords[0] === foundTeamWords[0] || 
+                           ourTeamWords[0].startsWith(foundTeamWords[0]) || 
+                           foundTeamWords[0].startsWith(ourTeamWords[0]));
+                        
+                        const isOurTeam = hasStrongMatch && firstWordMatches;
+                        
+                        if (isOurTeam) {
                           ourTeamInTable = foundTeam;
                           if (!opponentInTable) {
                             isOurTeamFirst = true;
@@ -2982,7 +3022,7 @@
                     
                     <div className="p-6">
                       <div className="bg-purple-50 p-4 rounded mb-4">
-                        <h3 className="font-bold mb-2">📦 Subscriber Build Export v13.3.2</h3>
+                        <h3 className="font-bold mb-2">📦 Subscriber Build Export v14.2</h3>
                         <p className="text-sm text-gray-600 mb-2">
                           Copy this JSON configuration and send it to Claude to build a customized subscriber version. 
                         </p>
