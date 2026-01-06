@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rosemount Irish v3.7</title>
+    <title>Rosemount Irish v3.8</title>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -763,7 +763,7 @@
             const exportObj = {
               _exportInfo: {
                 exportDate: new Date().toISOString(),
-                version: '3.7',
+                version: '3.8',
                 teamName: myTeamSetup.teamName,
                 description: 'Full team configuration for subscriber site build'
               },
@@ -1677,27 +1677,62 @@
                 if (fields.length < 3) continue;
                 
                 const number = fields[0];
-                const name = fields[1];
+                let name = fields[1];
                 
                 if (!/^\d+$/.test(number)) continue;
                 
+                // Detect new format: check if fields[2] is a position (F, D, G, D|F)
+                const hasNewFormat = fields[2] && /^(F|D|G|D\|F)$/i.test(fields[2]);
+                
+                // Extract Pos and Grade from new format (if present)
+                let statsPosition = null;
+                let statsGrade = null;
+                let fieldOffset = 0;  // Offset for stat field indices
+                
+                if (hasNewFormat) {
+                  statsPosition = fields[2];  // F, D, G, or D|F
+                  statsGrade = fields[3];     // 9, 10, 11, or 12
+                  fieldOffset = 2;             // Stats start at fields[4] instead of fields[2]
+                  console.log(`📊 New format detected for ${name}: Pos=${statsPosition}, Grade=${statsGrade}`);
+                }
+                
+                // Strip (Capt.) from name for matching
+                const cleanName = name.replace(/\s*\(Capt\.?\)/i, '').trim();
+                
                 if (inSkaterSection) {
-                  const player = updatedRoster.find(p => p.number === number && p.position !== 'G');
+                  const player = updatedRoster.find(p => 
+                    p.number === number && 
+                    p.position !== 'G' &&
+                    (p.name === cleanName || p.name === name)
+                  );
                   
-                  if (player && fields.length >= 6) {
+                  if (player && fields.length >= (6 + fieldOffset)) {
+                    // Validate Pos and Grade against roster (if new format)
+                    if (hasNewFormat) {
+                      const normalizedStatsPos = statsPosition === 'D|F' ? 'D' : statsPosition;
+                      const normalizedRosterPos = player.position === 'D|F' ? 'D' : player.position;
+                      
+                      if (normalizedRosterPos !== normalizedStatsPos) {
+                        console.warn(`⚠️ Position mismatch for ${cleanName}: Roster=${player.position}, Stats=${statsPosition}`);
+                      }
+                      if (player.grade !== statsGrade) {
+                        console.warn(`⚠️ Grade mismatch for ${cleanName}: Roster=${player.grade}, Stats=${statsGrade}`);
+                      }
+                    }
+                    
                     const currentStats = {
-                      gp: parseInt(fields[2]) || 0,
-                      g: parseInt(fields[3]) || 0,
-                      a: parseInt(fields[4]) || 0,
-                      pts: parseInt(fields[5]) || 0,
-                      ppg: parseInt(fields[8]) || 0,
-                      ppa: parseInt(fields[9]) || 0,
-                      sh: parseInt(fields[10]) || 0,
-                      sha: parseInt(fields[11]) || 0,
-                      pim: parseInt(fields[13]) || 0,
-                      fow: parseInt(fields[14]) || 0,
-                      fol: parseInt(fields[15]) || 0,
-                      plusMinus: parseInt(fields[19]) || 0
+                      gp: parseInt(fields[2 + fieldOffset]) || 0,
+                      g: parseInt(fields[3 + fieldOffset]) || 0,
+                      a: parseInt(fields[4 + fieldOffset]) || 0,
+                      pts: parseInt(fields[5 + fieldOffset]) || 0,
+                      ppg: parseInt(fields[8 + fieldOffset]) || 0,
+                      ppa: parseInt(fields[9 + fieldOffset]) || 0,
+                      sh: parseInt(fields[10 + fieldOffset]) || 0,
+                      sha: parseInt(fields[11 + fieldOffset]) || 0,
+                      pim: parseInt(fields[13 + fieldOffset]) || 0,
+                      fow: parseInt(fields[14 + fieldOffset]) || 0,
+                      fol: parseInt(fields[15 + fieldOffset]) || 0,
+                      plusMinus: parseInt(fields[19 + fieldOffset]) || 0
                     };
                     
                     player.stats = currentStats;
@@ -1719,24 +1754,38 @@
                       fol: totalFOL
                     };
                     
-                    console.log(`✓ Updated ${name}:`, player.stats, 'Career:', player.careerStats);
+                    console.log(`✓ Updated ${cleanName}:`, player.stats, 'Career:', player.careerStats);
                   }
                 } else if (inGoalieSection) {
-                  const player = updatedRoster.find(p => p.number === number && p.position === 'G');
+                  const player = updatedRoster.find(p => 
+                    p.number === number && 
+                    p.position === 'G' &&
+                    (p.name === cleanName || p.name === name)
+                  );
                   
-                  if (player && player.goalieStats && fields.length >= 10) {
+                  if (player && player.goalieStats && fields.length >= (10 + fieldOffset)) {
+                    // Validate Pos and Grade against roster (if new format)
+                    if (hasNewFormat) {
+                      if (player.position !== statsPosition) {
+                        console.warn(`⚠️ Position mismatch for ${cleanName}: Roster=${player.position}, Stats=${statsPosition}`);
+                      }
+                      if (player.grade !== statsGrade) {
+                        console.warn(`⚠️ Grade mismatch for ${cleanName}: Roster=${player.grade}, Stats=${statsGrade}`);
+                      }
+                    }
+                    
                     const currentGoalieStats = {
-                      gp: parseInt(fields[2]) || 0,
-                      min: fields[3] || '0:00',
-                      w: parseInt(fields[4]) || 0,
-                      l: parseInt(fields[5]) || 0,
-                      t: parseInt(fields[6]) || 0,
-                      sog: parseInt(fields[7]) || 0,
-                      ga: parseInt(fields[8]) || 0,
-                      sv: parseInt(fields[9]) || 0,
-                      gaa: parseFloat(fields[10]) || 0,
-                      svp: fields[11] || '.000',
-                      so: parseInt(fields[12]) || 0
+                      gp: parseInt(fields[2 + fieldOffset]) || 0,
+                      min: fields[3 + fieldOffset] || '0:00',
+                      w: parseInt(fields[4 + fieldOffset]) || 0,
+                      l: parseInt(fields[5 + fieldOffset]) || 0,
+                      t: parseInt(fields[6 + fieldOffset]) || 0,
+                      sog: parseInt(fields[7 + fieldOffset]) || 0,
+                      ga: parseInt(fields[8 + fieldOffset]) || 0,
+                      sv: parseInt(fields[9 + fieldOffset]) || 0,
+                      gaa: parseFloat(fields[10 + fieldOffset]) || 0,
+                      svp: fields[11 + fieldOffset] || '.000',
+                      so: parseInt(fields[12 + fieldOffset]) || 0
                     };
                     
                     player.goalieStats = currentGoalieStats;
@@ -1774,7 +1823,7 @@
                       svp: careerSVP
                     };
                     
-                    console.log(`✓ Updated goalie ${name}:`, player.goalieStats, 'Career:', player.careerGoalieStats);
+                    console.log(`✓ Updated goalie ${cleanName}:`, player.goalieStats, 'Career:', player.careerGoalieStats);
                   }
                 }
               }
@@ -3022,7 +3071,7 @@
                     
                     <div className="p-6">
                       <div className="bg-purple-50 p-4 rounded mb-4">
-                        <h3 className="font-bold mb-2">📦 Subscriber Build Export v14.2</h3>
+                        <h3 className="font-bold mb-2">📦 Subscriber Build Export v14.3</h3>
                         <p className="text-sm text-gray-600 mb-2">
                           Copy this JSON configuration and send it to Claude to build a customized subscriber version. 
                         </p>
