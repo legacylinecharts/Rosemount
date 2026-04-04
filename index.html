@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Legacy Line Charts v18.6 &ndash; Rosemount Irish</title>
+    <title>Legacy Line Charts v20.1</title>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
     <style>
         * {
             font-family: 'Arial Narrow', Arial, sans-serif;
@@ -107,6 +108,13 @@
             </svg>
         );
 
+        const Share = ({ size = 16 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+            </svg>
+        );
+
         // ============================================================
         // SUBSCRIBER CONFIGURATION
         // Set SUBSCRIBER_MODE = true when building subscriber sites
@@ -182,6 +190,7 @@
             season3: "\nRegistration Details\nAssets\nSite Guide\nStyle Guide\nskip navigation\nTeam Search\nSearch\nSouth Suburban\nApple Valley/Burnsville\t\nEagan\t\nEastview\t\nFarmington\t\nLakeville North\t\nLakeville South\t\nPrior Lake\t\nRosemount\t\nShakopee\t\nShare this Team >\nRegular & Postseason\n2022-23\nConference Standings\n South Suburban \n Rosemount \nRosemount\nHome\nRoster\nGame Schedule\nPlayer Stats\nTeam Stats\nStandings\nPhotos\nVideos\nPosts\nLeague\nDivision\nFilters\nPosition\nAll\nGoalieForwardDefense\nPlayer Stats\nSkater\n#\tName\tGP\tG\tA\tPTS\tSOG\tSOG %\tPPG\tPPA\tSH\tSHA\tPEN\tPIM\tFOW\tFOL\tTO\tHIT\tBS\t+ / -\tGW\tAVG PTS\n22\tCaden Hegarty\t27\t10\t34\t44\t104\t9.6\t0\t14\t0\t0\t3\t4\t0\t0\t0\t0\t0\t15\t1\t1.63\n23\tCadyn Campbell\t27\t18\t24\t42\t79\t22.8\t7\t5\t1\t0\t11\t22\t0\t0\t0\t0\t0\t8\t1\t1.56\n16\tChristian Garrity \t27\t22\t11\t33\t86\t25.6\t4\t4\t1\t0\t6\t12\t0\t0\t0\t0\t0\t9\t3\t1.22\n21\tJake Toll\t27\t12\t19\t31\t118\t10.2\t8\t3\t0\t1\t12\t35\t0\t0\t0\t0\t0\t14\t1\t1.15\n26\tJosh Toll\t27\t2\t17\t19\t38\t5.3\t0\t6\t0\t0\t1\t2\t0\t0\t0\t0\t0\t7\t1\t0.70\n17\tOwen Durigan\t25\t7\t11\t18\t82\t8.5\t0\t5\t0\t1\t6\t12\t0\t0\t0\t0\t0\t10\t1\t0.72\n2\tTy Hansen\t26\t8\t10\t18\t52\t15.4\t1\t2\t0\t1\t20\t49\t0\t0\t0\t0\t0\t1\t1\t0.69\n18\tJackson Ganser\t26\t6\t12\t18\t75\t8.0\t1\t4\t0\t0\t11\t22\t0\t0\t0\t0\t0\t-3\t0\t0.69\n7\tLuca Salak\t27\t4\t6\t10\t43\t9.3\t1\t0\t1\t0\t5\t10\t0\t0\t0\t0\t0\t-7\t1\t0.37\n9\tKade Lotysz \t27\t4\t6\t10\t40\t10.0\t2\t1\t0\t0\t14\t28\t0\t0\t0\t0\t0\t0\t0\t0.37\n12\tHans Hedlund \t5\t4\t5\t9\t23\t17.4\t1\t2\t0\t0\t4\t8\t0\t0\t0\t0\t0\t7\t1\t1.80\n11\tEli Lewis\t23\t3\t5\t8\t45\t6.7\t0\t1\t0\t0\t12\t27\t0\t0\t0\t0\t0\t4\t2\t0.35\n27\tRyker Sabo \t27\t0\t5\t5\t24\t0.0\t0\t0\t0\t2\t4\t8\t0\t0\t0\t0\t0\t11\t0\t0.19\n4\tBenny Rutzick\t23\t0\t4\t4\t18\t0.0\t0\t0\t0\t0\t4\t8\t0\t0\t0\t0\t0\t5\t0\t0.17\n20\tBurke Retka\t25\t2\t2\t4\t16\t12.5\t0\t1\t0\t0\t6\t12\t0\t0\t0\t0\t0\t2\t0\t0.16\n37\tDylan Herold\t19\t2\t1\t3\t15\t13.3\t0\t0\t0\t0\t1\t2\t0\t0\t0\t0\t0\t2\t1\t0.16\n1\tTristan Fischer\t1\t0\t1\t1\t0\t0.0\t0\t1\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t1.00\n8\tAiden Clements\t26\t1\t0\t1\t32\t3.1\t0\t0\t0\t0\t9\t18\t0\t0\t0\t0\t0\t-5\t0\t0.04\n19\tBraeden McCracken\t10\t0\t0\t0\t2\t0.0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0.00\n6\tMichael Carlson\t9\t0\t0\t0\t3\t0.0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t-1\t0\t0.00\n13\tCarter Ganser\t3\t0\t0\t0\t1\t0.0\t0\t0\t0\t0\t1\t2\t0\t0\t0\t0\t0\t0\t0\t0.00\n5\tTJ Kelsey\t6\t0\t0\t0\t1\t0.0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t-1\t0\t0.00\n24\tGrayson Bartol\t3\t0\t0\t0\t0\t0.0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0.00\n40\tCade Sherman\t6\t0\t0\t0\t3\t0.0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t-2\t0\t0.00\n42\tLuca Parla\t1\t0\t0\t0\t0\t0.0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0.00\nGoalie\n#\tName\tGP\tMIN\tW\tL\tT\tSOG\tGA\tSV\tGAA\tSV %\tSO\n33\tCade Denny\t12\t565:41\t5\t6\t0\t250\t38\t212\t3.43\t.848\t1\n35\tTrent Nelson\t1\t51:00\t1\t0\t0\t18\t2\t16\t2.00\t.889\t0\n1\tTristan Fischer\t16\t771:45\t8\t6\t1\t407\t45\t362\t2.97\t.889\t1\n"
           }
         };
+        // ====
         // ============================================================
 
         // ============================================================
@@ -623,6 +632,9 @@
           const [showExport, setShowExport] = useState(false);
           const [exportData, setExportData] = useState('');
           const [showHelp, setShowHelp] = useState(false);
+          const [showShareModal, setShowShareModal] = useState(false);
+          const [shareImageData, setShareImageData] = useState(null);
+          const [shareGenerating, setShareGenerating] = useState(false);
           const [helpContent, setHelpContent] = useState({ title: '', steps: [] });
           const [importStep, setImportStep] = useState('myTeamHome');
           const [importText, setImportText] = useState('');
@@ -1053,7 +1065,7 @@
             const exportObj = {
               _exportInfo: {
                 exportDate: new Date().toISOString(),
-                version: '18.6',
+                version: '20.1',
                 teamName: myTeamSetup.teamName,
                 description: 'Full team configuration for subscriber site build'
               },
@@ -1352,6 +1364,18 @@
                     if (!coachNameFound && i > coachIdx + 1) {
                       headCoach.name = lines[i - 1];
                       coachNameFound = true;
+                    } else if (coachNameFound) {
+                      // Name may be split across two lines (first name then last name)
+                      // Only combine if: captured name has no spaces (just a first name)
+                      // AND the line before the record is different and looks like a last name
+                      const lineBeforeRecord = lines[i - 1];
+                      const capturedHasNoSpace = !headCoach.name.includes(' ');
+                      if (capturedHasNoSpace && lineBeforeRecord &&
+                          lineBeforeRecord !== headCoach.name &&
+                          !lineBeforeRecord.match(/\d/) && lineBeforeRecord.length > 1 &&
+                          !lineBeforeRecord.includes('Phone:') && !lineBeforeRecord.toUpperCase().includes('HEAD COACH')) {
+                        headCoach.name = `${headCoach.name} ${lineBeforeRecord}`;
+                      }
                     }
                     // Prefer overall record if available, otherwise use career/year record
                     const matchToUse = overallMatch || careerMatch;
@@ -1365,6 +1389,15 @@
                   } else if (line.includes('1st Year') || line.includes('1st year') || line.match(/^1st\s+(?:season|year)/i)) {
                     if (!coachNameFound && i > coachIdx + 1) {
                       headCoach.name = lines[i - 1];
+                    } else if (coachNameFound) {
+                      const lineBeforeRecord = lines[i - 1];
+                      const capturedHasNoSpace = !headCoach.name.includes(' ');
+                      if (capturedHasNoSpace && lineBeforeRecord &&
+                          lineBeforeRecord !== headCoach.name &&
+                          !lineBeforeRecord.match(/\d/) && lineBeforeRecord.length > 1 &&
+                          !lineBeforeRecord.includes('Phone:') && !lineBeforeRecord.toUpperCase().includes('HEAD COACH')) {
+                        headCoach.name = `${headCoach.name} ${lineBeforeRecord}`;
+                      }
                     }
                     headCoach.careerRecord = { w: 0, l: 0, t: 0 };
                     console.log('✅ Found first-year head coach:', headCoach.name);
@@ -2853,7 +2886,7 @@
             
             const fontScale = isPreview ? 0.3125 : 1;
             const statFontSize = `${8 * fontScale}pt`;
-            const nameFontSize = `${24 * fontScale}pt`;
+            const nameFontSize = `${20 * fontScale}pt`;
             const infoFontSize = statFontSize;
             const pronunciationFontSize = `${12.5 * fontScale}pt`;
             
@@ -2881,7 +2914,7 @@
               }
               
               if (nameRef.current) {
-                const baseMaxSize = 24;
+                const baseMaxSize = 20;
                 const maxNameSize = isPreview ? baseMaxSize * 0.3125 : baseMaxSize;
                 const minNameSize = isPreview ? 3.125 : 10;
                 // Width-only shrink for name — height is not a constraint
@@ -2929,22 +2962,28 @@
                 }}
               >
                 <div style={{ 
-                  width: '35%',
+                  width: '32.5%',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'flex-start',
                   alignSelf: 'stretch',
                   borderRight: 'none',
-                  backgroundImage: 'linear-gradient(to bottom, transparent 2px, #333 2px, #333 calc(100% - 2px), transparent calc(100% - 2px))',
-                  backgroundPosition: 'right center',
-                  backgroundSize: '2px 100%',
-                  backgroundRepeat: 'no-repeat',
+                  position: 'relative',
                   paddingRight: '2px',
                   paddingBottom: '3px',
                   marginTop: '-1px',
                   overflow: 'hidden'
                 }}>
+                  {/* Vertical divider — absolute positioned, inset 3px top/bottom, no gradient/transparency */}
+                  <div style={{
+                    position: 'absolute',
+                    right: 0,
+                    top: '3px',
+                    bottom: '3px',
+                    width: '2px',
+                    backgroundColor: '#222222'
+                  }} />
                   {/* Number — normal size, original resize behavior */}
                   <div
                     ref={numberRef}
@@ -3004,13 +3043,13 @@
                 </div>
                 
                 <div style={{ 
-                  width: '65%',
+                  width: '67.5%',
                   paddingLeft: '4px',
                   paddingRight: '4px',
                   display: 'flex',
                   flexDirection: 'column',
-                  justifyContent: 'flex-end',
-                  gap: '1px'
+                  justifyContent: 'flex-start',
+                  gap: '0px'
                 }}>
                   <div 
                     ref={nameRef}
@@ -3027,12 +3066,13 @@
                     {player.name}
                   </div>
                   
+                  <div style={{ marginTop: 'auto', width: '100%' }}>
                   <div style={{ 
                     display: 'flex',
                     justifyContent: 'space-between',
                     fontSize: infoFontSize,
                     lineHeight: '1.0',
-                    marginBottom: '1px'
+                    marginBottom: '0px'
                   }}>
                     {/* Build info parts array, only include non-empty values */}
                     {(() => {
@@ -3166,6 +3206,7 @@
                       </div>
                     </>
                   )}
+                  </div>
                 </div>
               </div>
             );
@@ -3771,6 +3812,227 @@
               )}
 
               {/* Help Modal */}
+              {showShareModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+                  <div className="bg-white rounded-lg shadow-xl w-full max-w-lg">
+                    <div className="border-b px-6 py-4 flex justify-between items-center">
+                      <h2 className="text-xl font-bold">📲 Share Game Sheet</h2>
+                      <button onClick={() => { setShowShareModal(false); setShareImageData(null); }} className="text-gray-500 hover:text-gray-700">
+                        <X size={24} />
+                      </button>
+                    </div>
+
+                    <div className="p-6 space-y-4">
+                      {shareGenerating && (
+                        <div className="text-center py-8">
+                          <div className="text-4xl mb-3">⏳</div>
+                          <div className="font-semibold text-gray-700">Rendering your PDF at 288dpi...</div>
+                          <div className="text-sm text-gray-500 mt-1">Just a moment</div>
+                        </div>
+                      )}
+
+                      {!shareGenerating && !shareImageData && (
+                        <div className="text-center py-4">
+                          <div className="bg-amber-50 border border-amber-300 rounded-lg px-4 py-2 mb-4 text-left">
+                            <p className="text-xs font-bold text-amber-800">⚠️ Use a freshly printed PDF</p>
+                            <p className="text-xs text-amber-700 mt-0.5">Click <strong>PDF Print</strong> in the nav bar first, save it, then upload here. An old PDF may have display artifacts.</p>
+                          </div>
+                          <div className="text-5xl mb-3">📄</div>
+                          <p className="text-lg font-bold text-gray-800 mb-1">Upload Your Game Sheet PDF</p>
+                          <p className="text-sm text-gray-500 mb-5">
+                            First use <strong>PDF Print</strong> to save your game sheet,<br/>then upload it here for a perfect social media image.
+                          </p>
+
+                          {/* Step visual */}
+                          <div className="flex items-center justify-center gap-2 mb-6 text-xs text-gray-500">
+                            <div className="flex flex-col items-center gap-1">
+                              <div className="w-8 h-8 rounded-full bg-sky-500 text-white flex items-center justify-center font-bold">1</div>
+                              <span>PDF Print</span>
+                            </div>
+                            <div className="text-gray-300 text-lg mb-3">→</div>
+                            <div className="flex flex-col items-center gap-1">
+                              <div className="w-8 h-8 rounded-full bg-sky-500 text-white flex items-center justify-center font-bold">2</div>
+                              <span>Upload here</span>
+                            </div>
+                            <div className="text-gray-300 text-lg mb-3">→</div>
+                            <div className="flex flex-col items-center gap-1">
+                              <div className="w-8 h-8 rounded-full bg-sky-500 text-white flex items-center justify-center font-bold">3</div>
+                              <span>Share!</span>
+                            </div>
+                          </div>
+
+                          <label className="cursor-pointer inline-block bg-sky-500 text-white px-10 py-4 rounded-xl hover:bg-sky-600 font-bold text-lg shadow-md">
+                            📄 Choose PDF File
+                            <input
+                              type="file"
+                              accept=".pdf,application/pdf"
+                              className="hidden"
+                              onChange={async (e) => {
+                                const file = e.target.files[0];
+                                if (!file) return;
+                                setShareGenerating(true);
+                                try {
+                                  const arrayBuffer = await file.arrayBuffer();
+                                  const pdfData = new Uint8Array(arrayBuffer);
+
+                                  const pdfjsLib = window.pdfjsLib;
+                                  pdfjsLib.GlobalWorkerOptions.workerSrc =
+                                    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.worker.min.js';
+
+                                  const pdfDoc = await pdfjsLib.getDocument({ data: pdfData }).promise;
+                                  const pdfPage = await pdfDoc.getPage(1);
+
+                                  // scale=3 → 216dpi — reduced from 4 to avoid PDF.js color artifacts
+                                  const viewport = pdfPage.getViewport({ scale: 3 });
+                                  const renderCanvas = document.createElement('canvas');
+                                  renderCanvas.width = viewport.width;
+                                  renderCanvas.height = viewport.height;
+
+                                  await pdfPage.render({
+                                    canvasContext: renderCanvas.getContext('2d'),
+                                    viewport
+                                  }).promise;
+
+                                  // Post-process: neutralize pale pink PDF.js rendering artifacts
+                                  // These appear as light pinkish pixels on card borders at high scale.
+                                  // Algorithm targets only low-saturation pinkish light pixels,
+                                  // preserving vivid team colors (orange, red, green, etc.)
+                                  const ctx = renderCanvas.getContext('2d');
+                                  const imageData = ctx.getImageData(0, 0, renderCanvas.width, renderCanvas.height);
+                                  const px = imageData.data;
+                                  for (let i = 0; i < px.length; i += 4) {
+                                    const r = px[i], g = px[i+1], b = px[i+2];
+                                    const rDom = r - Math.max(g, b);  // how much R leads
+                                    const maxDiff = Math.max(r,g,b) - Math.min(r,g,b);  // saturation proxy
+                                    if (
+                                      r > 160 && g > 130 && b > 130 &&  // light color
+                                      rDom > 8 && rDom < 70 &&          // R leads slightly (pink, not vivid red)
+                                      maxDiff < 80 &&                    // low saturation (not vivid team color)
+                                      Math.abs(g - b) < 40              // G and B similar (pink not orange)
+                                    ) {
+                                      const gray = Math.round(r * 0.299 + g * 0.587 + b * 0.114);
+                                      px[i] = gray; px[i+1] = gray; px[i+2] = gray;
+                                    }
+                                  }
+                                  ctx.putImageData(imageData, 0, 0);
+
+                                  setShareImageData(renderCanvas.toDataURL('image/png'));
+                                } catch(err) {
+                                  console.error('PDF render error:', err);
+                                  alert('Could not read that PDF. Make sure you\'re selecting your saved game sheet PDF.');
+                                } finally {
+                                  setShareGenerating(false);
+                                }
+                              }}
+                            />
+                          </label>
+                          <p className="text-xs text-gray-400 mt-3">Logos, colors, and all stats — exactly as printed</p>
+                        </div>
+                      )}
+
+                      {!shareGenerating && shareImageData && (
+                        <div className="space-y-4">
+                          {/* Preview */}
+                          <div className="border rounded overflow-hidden" style={{ maxHeight: '280px', overflowY: 'auto' }}>
+                            <img src={shareImageData} alt="Game Sheet Page 1" style={{ width: '100%', display: 'block' }} />
+                          </div>
+
+                          <p className="text-xs text-gray-500 text-center">✅ Page 1 captured — choose how to share below</p>
+
+                          {/* Action buttons */}
+                          <div className="grid grid-cols-2 gap-3">
+                            {/* Download PNG */}
+                            <button
+                              onClick={() => {
+                                const a = document.createElement('a');
+                                const myTeam = myTeamSetup.teamName || 'MyTeam';
+                                const opp = opponentData.teamName ? `${opponentData.teamName} ${opponentData.nickname || ''}`.trim() : 'Opponent';
+                                const today = new Date();
+                                const dateStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+                                a.download = `LLC_${myTeam}_vs_${opp}_${dateStr}.png`.replace(/\s+/g, '_');
+                                a.href = shareImageData;
+                                a.click();
+                              }}
+                              className="bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-semibold flex items-center justify-center gap-2"
+                            >
+                              <Download size={18} /> Download PNG
+                            </button>
+
+                            {/* Copy to Clipboard */}
+                            <button
+                              onClick={async () => {
+                                try {
+                                  const res = await fetch(shareImageData);
+                                  const blob = await res.blob();
+                                  await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+                                  alert('✅ Image copied to clipboard! Open any app and paste.');
+                                } catch(err) {
+                                  alert('Copy failed — use Download PNG instead and post from your files.');
+                                }
+                              }}
+                              className="bg-gray-700 text-white py-3 rounded-lg hover:bg-gray-800 font-semibold flex items-center justify-center gap-2"
+                            >
+                              📋 Copy to Clipboard
+                            </button>
+
+                            {/* Web Share (mobile) */}
+                            <button
+                              onClick={async () => {
+                                if (!navigator.share) {
+                                  alert('Web Share not supported on this browser. Use Download PNG or Copy to Clipboard instead.');
+                                  return;
+                                }
+                                try {
+                                  const res = await fetch(shareImageData);
+                                  const blob = await res.blob();
+                                  const myTeam = myTeamSetup.teamName || 'MyTeam';
+                                  const opp = opponentData.teamName ? `${opponentData.teamName} ${opponentData.nickname || ''}`.trim() : 'Opponent';
+                                  const file = new File([blob], `LLC_${myTeam}_vs_${opp}.png`.replace(/\s+/g,'_'), { type: 'image/png' });
+                                  await navigator.share({
+                                    title: `${myTeam} vs ${opp} — Game Sheet`,
+                                    text: `Scouting report powered by Legacy Line Charts 🏒`,
+                                    files: [file]
+                                  });
+                                } catch(err) {
+                                  if (err.name !== 'AbortError') alert('Share failed. Try Download PNG instead.');
+                                }
+                              }}
+                              className="bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 font-semibold flex items-center justify-center gap-2"
+                            >
+                              📲 Share (Mobile)
+                            </button>
+
+                            {/* Twitter/X compose */}
+                            <button
+                              onClick={() => {
+                                const myTeam = myTeamSetup.teamName || 'My Team';
+                                const opp = opponentData.teamName ? `${opponentData.teamName} ${opponentData.nickname || ''}`.trim() : 'Opponent';
+                                const text = encodeURIComponent(`Game prep ready! ${myTeam} vs ${opp} 🏒 #MSHSL #HockeyMN\n\nPowered by @LegacyLineCharts`);
+                                window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
+                                setTimeout(() => alert('💡 Tip: After Twitter opens, add your PNG by attaching the downloaded image to the tweet.'), 400);
+                              }}
+                              className="bg-black text-white py-3 rounded-lg hover:bg-gray-900 font-semibold flex items-center justify-center gap-2"
+                            >
+                              𝕏 Post to Twitter
+                            </button>
+                          </div>
+
+                          {/* Regenerate */}
+                          <div className="text-center">
+                            <button
+                              onClick={() => setShareImageData(null)}
+                              className="text-sm text-blue-600 hover:text-blue-800 underline"
+                            >
+                              ↩ Regenerate image
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {showHelp && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                   <div className="bg-white rounded-lg shadow-xl max-w-lg w-full">
@@ -3875,6 +4137,13 @@
                       <div className="flex flex-col items-start" style={{ fontSize: '10px' }}>
                         <span>PDF</span>
                         <span>Print</span>
+                      </div>
+                    </button>
+                    <button onClick={() => { setShareImageData(null); setShowShareModal(true); }} className="bg-sky-500 text-white px-3 py-1 rounded hover:bg-sky-600 flex items-center gap-1 font-semibold" style={{ lineHeight: '1.1' }}>
+                      <Share size={16} />
+                      <div className="flex flex-col items-start" style={{ fontSize: '10px' }}>
+                        <span>Share</span>
+                        <span>Social</span>
                       </div>
                     </button>
                     <button 
@@ -4292,7 +4561,8 @@
                       }}>
                         <input
                           type="text"
-                          value={coachNotes.pkTitle || 'Add Notes'}
+                          value={coachNotes.pkTitle || ''}
+                          placeholder="Add Notes"
                           onChange={(e) => setCoachNotes({...coachNotes, pkTitle: e.target.value})}
                           className="w-full border-0 bg-transparent text-center font-bold placeholder-print-hide"
                           style={{ fontSize: '10px', padding: '0px', outline: 'none', marginBottom: '0px' }}
@@ -4323,7 +4593,8 @@
                       }}>
                         <input
                           type="text"
-                          value={coachNotes.ppTitle || 'Add Notes'}
+                          value={coachNotes.ppTitle || ''}
+                          placeholder="Add Notes"
                           onChange={(e) => setCoachNotes({...coachNotes, ppTitle: e.target.value})}
                           className="w-full border-0 bg-transparent text-center font-bold placeholder-print-hide"
                           style={{ fontSize: '10px', padding: '0px', outline: 'none', marginBottom: '0px' }}
@@ -4391,9 +4662,9 @@
                 {(() => {
                   // Top 3 leaders from opponent roster
                   const skaters = opponentData.roster.filter(p => p.position !== 'G' && p.stats);
-                  const topG   = [...skaters].sort((a,b) => (b.stats.g||0)  - (a.stats.g||0)).slice(0,3);
-                  const topA   = [...skaters].sort((a,b) => (b.stats.a||0)  - (a.stats.a||0)).slice(0,3);
-                  const topPts = [...skaters].sort((a,b) => (b.stats.pts||0)- (a.stats.pts||0)).slice(0,3);
+                  const topG   = [...skaters].sort((a,b) => (b.stats.g||0)  - (a.stats.g||0)).slice(0,4);
+                  const topA   = [...skaters].sort((a,b) => (b.stats.a||0)  - (a.stats.a||0)).slice(0,4);
+                  const topPts = [...skaters].sort((a,b) => (b.stats.pts||0)- (a.stats.pts||0)).slice(0,4);
 
                   const oc = opponentColors.primary;
                   const os = opponentColors.secondary;
@@ -4476,35 +4747,78 @@
                         <OppStatBox label="GA/Game"    value={opponentData.stats.gapg.toFixed(2)} />
                       </div>
 
-                      {/* COL 3 (40%): Offensive Leaders — Option B */}
-                      <div style={{
-                        padding: '5px 6px',
-                        border: `2px solid ${os}`,
-                        borderRadius: '6px',
-                        backgroundColor: `${oc}18`,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'center'
-                      }}>
-                        <div style={{ fontSize: 'clamp(12px, 1.4vw, 15px)', fontWeight: 'bold', color: oc, textAlign: 'center', marginBottom: '5px' }}>
-                          Offensive Leaders
-                        </div>
+                      {/* COL 3 (40%): Offensive Leaders — Mini Cards */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', paddingTop: '8px' }}>
+                        {/* Header bar */}
+                        <div style={{
+                          backgroundColor: oc,
+                          color: isColorDark(oc) ? '#FFFFFF' : '#000000',
+                          textAlign: 'center',
+                          fontWeight: '900',
+                          fontSize: 'clamp(10px, 1.2vw, 13px)',
+                          padding: '2px 4px',
+                          borderRadius: '3px',
+                          fontFamily: "'Arial Narrow', Arial, sans-serif",
+                          letterSpacing: '0.5px'
+                        }}>OFFENSIVE LEADERS</div>
+
+                        {/* 3-column grid of mini cards */}
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '3px' }}>
-                          {['Goals','Assists','Points'].map(h => (
-                            <div key={h} style={{ fontSize: 'clamp(9px, 1vw, 11px)', fontWeight: 'bold', color: oc, textAlign: 'center', borderBottom: `1px solid ${os}`, paddingBottom: '2px', marginBottom: '2px' }}>{h}</div>
-                          ))}
-                          {[0,1,2].map(i => (
-                            <React.Fragment key={i}>
-                              <div style={{ fontSize: 'clamp(9px, 1vw, 11px)', color: oc, textAlign: 'left' }}>
-                                {topG[i]   ? `#${topG[i].number} ${topG[i].lastName} ${topG[i].stats.g}`       : '—'}
-                              </div>
-                              <div style={{ fontSize: 'clamp(9px, 1vw, 11px)', color: oc, textAlign: 'left' }}>
-                                {topA[i]   ? `#${topA[i].number} ${topA[i].lastName} ${topA[i].stats.a}`       : '—'}
-                              </div>
-                              <div style={{ fontSize: 'clamp(9px, 1vw, 11px)', color: oc, textAlign: 'left' }}>
-                                {topPts[i] ? `#${topPts[i].number} ${topPts[i].lastName} ${topPts[i].stats.pts}` : '—'}
-                              </div>
-                            </React.Fragment>
+                          {[
+                            { label: 'GOALS',   players: topG,   stat: p => p.stats.g },
+                            { label: 'ASSISTS', players: topA,   stat: p => p.stats.a },
+                            { label: 'POINTS',  players: topPts, stat: p => p.stats.pts }
+                          ].map(({ label, players, stat }) => (
+                            <div key={label} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                              {/* Column header */}
+                              <div style={{
+                                backgroundColor: os,
+                                color: isColorDark(os) ? '#FFFFFF' : '#000000',
+                                textAlign: 'center',
+                                fontWeight: 'bold',
+                                fontSize: 'clamp(8px, 0.9vw, 10px)',
+                                padding: '1px 2px',
+                                borderRadius: '2px',
+                                fontFamily: "'Arial Narrow', Arial, sans-serif"
+                              }}>{label}</div>
+                              {/* 4 mini player cards */}
+                              {[0,1,2,3].map(i => (
+                                <div key={i} style={{
+                                  border: `1px solid ${oc}`,
+                                  borderRadius: '2px',
+                                  padding: '1px 3px',
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  alignItems: 'center',
+                                  backgroundColor: i === 0 ? `${oc}22` : '#ffffff',
+                                  minHeight: '14px'
+                                }}>
+                                  {players[i] ? (
+                                    <>
+                                      <span style={{
+                                        fontSize: 'clamp(8px, 0.9vw, 10px)',
+                                        fontFamily: "'Arial Narrow', Arial, sans-serif",
+                                        color: oc,
+                                        fontWeight: i === 0 ? 'bold' : 'normal',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap'
+                                      }}>#{players[i].number} {players[i].lastName} ({players[i].position === 'F' ? 'F' : players[i].position === 'D' ? 'D' : 'G'})</span>
+                                      <span style={{
+                                        fontSize: 'clamp(9px, 1vw, 11px)',
+                                        fontFamily: "'Arial Narrow', Arial, sans-serif",
+                                        color: oc,
+                                        fontWeight: 'bold',
+                                        marginLeft: '3px',
+                                        flexShrink: 0
+                                      }}>{stat(players[i])}</span>
+                                    </>
+                                  ) : (
+                                    <span style={{ fontSize: 'clamp(8px, 0.9vw, 10px)', color: '#999' }}>—</span>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
                           ))}
                         </div>
                       </div>
