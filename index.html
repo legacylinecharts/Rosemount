@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Legacy Line Charts v20.1</title>
+    <title>Legacy Line Charts v20.5</title>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -593,9 +593,9 @@
               console.error('Error loading saved diagram images:', error);
             }
             return {
-              image1: null,
-              image2: null,
-              image3: null
+              image1: null, image2: null, image3: null, image4: null,
+              notes1: '', notes2: '', notes3: '', notes4: '',
+              layout: '3uneven'
             };
           });
 
@@ -632,6 +632,9 @@
           const [showExport, setShowExport] = useState(false);
           const [exportData, setExportData] = useState('');
           const [showHelp, setShowHelp] = useState(false);
+          const [fwdSort, setFwdSort] = useState({ col: null, dir: 'desc' });
+          const [defSort, setDefSort] = useState({ col: null, dir: 'desc' });
+          const [goalieSort, setGoalieSort] = useState({ col: null, dir: 'desc' });
           const [showShareModal, setShowShareModal] = useState(false);
           const [shareImageData, setShareImageData] = useState(null);
           const [shareGenerating, setShareGenerating] = useState(false);
@@ -1065,7 +1068,7 @@
             const exportObj = {
               _exportInfo: {
                 exportDate: new Date().toISOString(),
-                version: '20.1',
+                version: '20.5',
                 teamName: myTeamSetup.teamName,
                 description: 'Full team configuration for subscriber site build'
               },
@@ -4847,9 +4850,47 @@
                                     totalPlayers >= 15 ? '11px' : '12px';
                     const padding = '1px 2px';
                     
-                    const forwards = opponentData.roster.filter(p => p.position === 'F').sort((a, b) => parseInt(a.number) - parseInt(b.number));
-                    const defense = opponentData.roster.filter(p => p.position === 'D').sort((a, b) => parseInt(a.number) - parseInt(b.number));
-                    const goalies = opponentData.roster.filter(p => p.position === 'G').sort((a, b) => parseInt(a.number) - parseInt(b.number));
+                    // Sort helper
+                    const applySortSkater = (arr, sortState) => {
+                      const base = [...arr].sort((a, b) => parseInt(a.number) - parseInt(b.number));
+                      if (!sortState.col) return base;
+                      return base.sort((a, b) => {
+                        let av, bv;
+                        if (sortState.col === 'num') { av = parseInt(a.number); bv = parseInt(b.number); }
+                        else { av = a.stats[sortState.col] || 0; bv = b.stats[sortState.col] || 0; }
+                        return sortState.dir === 'desc' ? bv - av : av - bv;
+                      });
+                    };
+                    const applySortGoalie = (arr, sortState) => {
+                      const base = [...arr].sort((a, b) => parseInt(a.number) - parseInt(b.number));
+                      if (!sortState.col) return base;
+                      return base.sort((a, b) => {
+                        const getVal = (p) => {
+                          if (sortState.col === 'num') return parseInt(p.number);
+                          if (sortState.col === 'min') {
+                            const m = (p.goalieStats?.min || '0:00').split(':');
+                            return parseInt(m[0]) * 60 + parseInt(m[1] || 0);
+                          }
+                          if (sortState.col === 'gaa') return parseFloat(p.goalieStats?.gaa || 99);
+                          if (sortState.col === 'svp') return parseFloat(p.goalieStats?.svp || '0') || 0;
+                          return 0;
+                        };
+                        return sortState.dir === 'desc' ? getVal(b) - getVal(a) : getVal(a) - getVal(b);
+                      });
+                    };
+                    const toggleSort = (current, setCurrent, col) => {
+                      if (current.col === col) {
+                        setCurrent({ col, dir: current.dir === 'desc' ? 'asc' : 'desc' });
+                      } else {
+                        setCurrent({ col, dir: col === 'gaa' ? 'asc' : 'desc' });
+                      }
+                    };
+                    const sortArrow = (sortState, col) => '';
+                    const sortStyle = (sortState, col) => sortState.col === col ? { textDecoration: 'underline', cursor: 'pointer' } : { cursor: 'pointer' };
+
+                    const forwards = applySortSkater(opponentData.roster.filter(p => p.position === 'F'), fwdSort);
+                    const defense = applySortSkater(opponentData.roster.filter(p => p.position === 'D'), defSort);
+                    const goalies = applySortGoalie(opponentData.roster.filter(p => p.position === 'G'), goalieSort);
                     
                     const fwdMaxStats = {
                       g: Math.max(...forwards.map(p => p.stats.g), 0),
@@ -4874,6 +4915,18 @@
                     };
                     
                     const isMaxStat = (value, maxValue) => value > 0 && value === maxValue;
+                    const isMinStat = (value, minValue) => value > 0 && value === minValue;
+
+                    // Goalie leader stats
+                    const gMin = goalies.length ? Math.max(...goalies.map(p => {
+                      const m = (p.goalieStats?.min || '0:00').split(':');
+                      return parseInt(m[0]) * 60 + parseInt(m[1] || 0);
+                    })) : 0;
+                    const gW   = goalies.length ? Math.max(...goalies.map(p => p.goalieStats?.w || 0)) : 0;
+                    const gGAA = goalies.length ? Math.min(...goalies.filter(p => (p.goalieStats?.gp || 0) > 0).map(p => parseFloat(p.goalieStats?.gaa ?? 99))) : 99;
+                    const gSVP = goalies.length ? Math.max(...goalies.map(p => parseFloat(p.goalieStats?.svp || '0') || 0)) : 0;
+                    const gSO  = goalies.length ? Math.max(...goalies.map(p => p.goalieStats?.so || 0)) : 0;
+                    const goalieMinToSecs = (p) => { const m = (p.goalieStats?.min || '0:00').split(':'); return parseInt(m[0]) * 60 + parseInt(m[1] || 0); };
                     
                     // Calculate label color - use primary if secondary is too light
                     const getColorBrightness = (hexColor) => {
@@ -4898,13 +4951,13 @@
                           <table className="w-full border-collapse" style={{ fontSize }}>
                             <thead>
                               <tr className="bg-gray-200" style={{ fontSize: '10px', fontWeight: 'bold' }}>
-                                <th className="border p-1" style={{ padding, width: '22px' }}>#</th>
+                                <th className="border p-1" style={{ padding, width: '22px' }} onClick={() => toggleSort(fwdSort, setFwdSort, 'num')}><span style={sortStyle(fwdSort,'num')}>#{ sortArrow(fwdSort,'num')}</span></th>
                                 <th className="border p-1 text-left" style={{ padding, maxWidth: '100px', width: '100px' }}>Name</th>
                                 <th className="border p-1" style={{ padding, width: '20px' }}>Gr</th>
                                 <th className="border p-1" style={{ padding, width: '22px' }}>GP</th>
-                                <th className="border p-1" style={{ padding, width: '22px' }}>G</th>
-                                <th className="border p-1" style={{ padding, width: '22px' }}>A</th>
-                                <th className="border p-1" style={{ padding, width: '26px' }}>PTS</th>
+                                <th className="border p-1" style={{ padding, width: '22px' }} onClick={() => toggleSort(fwdSort, setFwdSort, 'g')}><span style={sortStyle(fwdSort,'g')}>G{sortArrow(fwdSort,'g')}</span></th>
+                                <th className="border p-1" style={{ padding, width: '22px' }} onClick={() => toggleSort(fwdSort, setFwdSort, 'a')}><span style={sortStyle(fwdSort,'a')}>A{sortArrow(fwdSort,'a')}</span></th>
+                                <th className="border p-1" style={{ padding, width: '26px' }} onClick={() => toggleSort(fwdSort, setFwdSort, 'pts')}><span style={sortStyle(fwdSort,'pts')}>PTS{sortArrow(fwdSort,'pts')}</span></th>
                                 <th className="border p-1" style={{ padding, width: '24px' }}>PPG</th>
                                 <th className="border p-1" style={{ padding, width: '24px' }}>PPA</th>
                                 <th className="border p-1" style={{ padding, width: '20px' }}>SH</th>
@@ -4944,13 +4997,13 @@
                           <table className="w-full border-collapse mb-2" style={{ fontSize }}>
                             <thead>
                               <tr className="bg-gray-200" style={{ fontSize: '10px', fontWeight: 'bold' }}>
-                                <th className="border p-1" style={{ padding, width: '22px' }}>#</th>
+                                <th className="border p-1" style={{ padding, width: '22px' }} onClick={() => toggleSort(defSort, setDefSort, 'num')}><span style={sortStyle(defSort,'num')}>#{ sortArrow(defSort,'num')}</span></th>
                                 <th className="border p-1 text-left" style={{ padding, maxWidth: '100px', width: '100px' }}>Name</th>
                                 <th className="border p-1" style={{ padding, width: '20px' }}>Gr</th>
                                 <th className="border p-1" style={{ padding, width: '22px' }}>GP</th>
-                                <th className="border p-1" style={{ padding, width: '22px' }}>G</th>
-                                <th className="border p-1" style={{ padding, width: '22px' }}>A</th>
-                                <th className="border p-1" style={{ padding, width: '26px' }}>PTS</th>
+                                <th className="border p-1" style={{ padding, width: '22px' }} onClick={() => toggleSort(defSort, setDefSort, 'g')}><span style={sortStyle(defSort,'g')}>G{sortArrow(defSort,'g')}</span></th>
+                                <th className="border p-1" style={{ padding, width: '22px' }} onClick={() => toggleSort(defSort, setDefSort, 'a')}><span style={sortStyle(defSort,'a')}>A{sortArrow(defSort,'a')}</span></th>
+                                <th className="border p-1" style={{ padding, width: '26px' }} onClick={() => toggleSort(defSort, setDefSort, 'pts')}><span style={sortStyle(defSort,'pts')}>PTS{sortArrow(defSort,'pts')}</span></th>
                                 <th className="border p-1" style={{ padding, width: '24px' }}>PPG</th>
                                 <th className="border p-1" style={{ padding, width: '24px' }}>PPA</th>
                                 <th className="border p-1" style={{ padding, width: '20px' }}>SH</th>
@@ -4984,39 +5037,47 @@
                           <table className="w-full border-collapse" style={{ fontSize }}>
                             <thead>
                               <tr className="bg-gray-200" style={{ fontSize: '10px', fontWeight: 'bold' }}>
-                                <th className="border p-1" style={{ padding, width: '22px' }}>#</th>
+                                <th className="border p-1" style={{ padding, width: '22px' }} onClick={() => toggleSort(goalieSort, setGoalieSort, 'num')}><span style={sortStyle(goalieSort,'num')}>#{ sortArrow(goalieSort,'num')}</span></th>
                                 <th className="border p-1 text-left" style={{ padding, maxWidth: '90px', width: '90px' }}>Name</th>
                                 <th className="border p-1" style={{ padding, width: '20px' }}>Gr</th>
-                                <th className="border p-1" style={{ padding, width: '46px' }}>MIN</th>
+                                <th className="border p-1" style={{ padding, width: '46px' }} onClick={() => toggleSort(goalieSort, setGoalieSort, 'min')}><span style={sortStyle(goalieSort,'min')}>MIN{sortArrow(goalieSort,'min')}</span></th>
                                 <th className="border p-1" style={{ padding, width: '20px' }}>W</th>
                                 <th className="border p-1" style={{ padding, width: '20px' }}>L</th>
                                 <th className="border p-1" style={{ padding, width: '20px' }}>T</th>
                                 <th className="border p-1" style={{ padding, width: '28px' }}>SOG</th>
                                 <th className="border p-1" style={{ padding, width: '24px' }}>SV</th>
                                 <th className="border p-1" style={{ padding, width: '22px' }}>GA</th>
-                                <th className="border p-1" style={{ padding, width: '32px' }}>GAA</th>
-                                <th className="border p-1" style={{ padding, width: '32px' }}>SV%</th>
+                                <th className="border p-1" style={{ padding, width: '32px' }} onClick={() => toggleSort(goalieSort, setGoalieSort, 'gaa')}><span style={sortStyle(goalieSort,'gaa')}>GAA{sortArrow(goalieSort,'gaa')}</span></th>
+                                <th className="border p-1" style={{ padding, width: '32px' }} onClick={() => toggleSort(goalieSort, setGoalieSort, 'svp')}><span style={sortStyle(goalieSort,'svp')}>SV%{sortArrow(goalieSort,'svp')}</span></th>
                                 <th className="border p-1" style={{ padding, width: '20px' }}>SO</th>
                               </tr>
                             </thead>
                             <tbody>
-                              {goalies.map((player, idx) => (
+                              {goalies.map((player, idx) => {
+                                const gp = player.goalieStats?.gp || 0;
+                                const minSecs = goalieMinToSecs(player);
+                                const gaaVal = parseFloat(player.goalieStats?.gaa ?? 99);
+                                const svpVal = parseFloat(player.goalieStats?.svp || '0') || 0;
+                                const wVal = player.goalieStats?.w || 0;
+                                const soVal = player.goalieStats?.so || 0;
+                                return (
                                 <tr key={player.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                                   <td className="border font-bold text-center" style={{ padding }}>{player.number}</td>
                                   <td className="border" style={{ padding, maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{player.firstName} {player.lastName}</td>
                                   <td className="border text-center" style={{ padding }}>{convertGradeToText(player.grade)}</td>
-                                  <td className="border text-center" style={{ padding }}>{player.goalieStats?.min || '0:00'}</td>
-                                  <td className="border text-center" style={{ padding }}>{player.goalieStats?.w || 0}</td>
+                                  <td className="border text-center" style={{ padding, backgroundColor: gp > 0 && minSecs > 0 && minSecs === gMin ? '#FFFF00' : 'transparent' }}>{player.goalieStats?.min || '0:00'}</td>
+                                  <td className="border text-center" style={{ padding, backgroundColor: isMaxStat(wVal, gW) ? '#FFFF00' : 'transparent' }}>{wVal}</td>
                                   <td className="border text-center" style={{ padding }}>{player.goalieStats?.l || 0}</td>
                                   <td className="border text-center" style={{ padding }}>{player.goalieStats?.t || 0}</td>
                                   <td className="border text-center" style={{ padding }}>{player.goalieStats?.sog || 0}</td>
                                   <td className="border text-center" style={{ padding }}>{player.goalieStats?.sv || 0}</td>
                                   <td className="border text-center" style={{ padding }}>{player.goalieStats?.ga || 0}</td>
-                                  <td className="border text-center font-bold" style={{ padding }}>{player.goalieStats?.gaa.toFixed(2) || '0.00'}</td>
-                                  <td className="border text-center font-bold" style={{ padding }}>{player.goalieStats?.svp || '.000'}</td>
-                                  <td className="border text-center" style={{ padding }}>{player.goalieStats?.so || 0}</td>
+                                  <td className="border text-center font-bold" style={{ padding, backgroundColor: gp > 0 && gGAA < 99 && gaaVal === gGAA ? '#FFFF00' : 'transparent' }}>{player.goalieStats?.gaa?.toFixed(2) ?? '0.00'}</td>
+                                  <td className="border text-center font-bold" style={{ padding, backgroundColor: gp > 0 && svpVal > 0 && svpVal === gSVP ? '#FFFF00' : 'transparent' }}>{player.goalieStats?.svp || '.000'}</td>
+                                  <td className="border text-center" style={{ padding, backgroundColor: isMaxStat(soVal, gSO) ? '#FFFF00' : 'transparent' }}>{soVal}</td>
                                 </tr>
-                              ))}
+                                );
+                              })}
                             </tbody>
                           </table>
                         </div>
@@ -5026,188 +5087,112 @@
                 </div>
 
                 {/* Diagrams & Notes */}
-                <div className="mt-2" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', flex: 1, minHeight: 0 }}>
-                  <div style={{ display: 'flex', gap: '4px', flexGrow: 1, minHeight: 0 }}>
-                    {/* COLUMN 1: Large diagram (60%) */}
-                    <div style={{ width: '60%', position: 'relative', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-                      {diagramImages.image1 ? (
-                        <div className="relative w-full flex-1" style={{ minHeight: 0, overflow: 'hidden' }}>
-                          <img src={diagramImages.image1} alt="Diagram 1" style={{ width: '100%', height: '100%', maxHeight: '100%', objectFit: 'contain', display: 'block' }} />
-                          <button
-                            onClick={() => setDiagramImages({...diagramImages, image1: null})}
-                            className="no-print absolute top-0 right-0 bg-red-500 text-white text-xs px-2 py-1 rounded hover:bg-red-600"
-                          >
-                            ×
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="flex-1 flex flex-col bg-gray-50 rounded p-1 no-print">
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={async (e) => {
-                              const file = e.target.files[0];
-                              if (file) {
-                                try {
-                                  const compressedImage = await compressImage(file);
-                                  setDiagramImages({...diagramImages, image1: compressedImage});
-                                } catch (error) {
-                                  console.error('Error compressing image:', error);
-                                  alert('Error processing image. Please try a different image.');
-                                }
-                              }
-                            }}
-                            className="no-print w-full text-xs mb-1"
-                          />
-                          <div 
-                            style={{ fontSize: '9px', lineHeight: '1.3' }} 
-                            className="flex-1 text-gray-600 border border-gray-300 rounded p-1 bg-white"
-                            contentEditable
-                            suppressContentEditableWarning
-                            onPaste={async (e) => {
-                              const items = e.clipboardData.items;
-                              for (let i = 0; i < items.length; i++) {
-                                if (items[i].type.indexOf('image') !== -1) {
-                                  e.preventDefault();
-                                  const blob = items[i].getAsFile();
-                                  try {
-                                    const compressedImage = await compressImage(blob);
-                                    setDiagramImages({...diagramImages, image1: compressedImage});
-                                  } catch (error) {
-                                    console.error('Error compressing pasted image:', error);
-                                  }
-                                  break;
-                                }
-                              }
-                            }}
-                          >
-                            Paste image or notes...
+                {(() => {
+                  const layout = diagramImages.layout || '3uneven';
+
+                  // Layout definitions: [colWidth%, ...] — spacers handled via gap
+                  const layoutConfigs = {
+                    '1col':      { cols: 1, widths: ['100%'],                        gap: '0%',   label: '1 Column' },
+                    '2col':      { cols: 2, widths: ['48%','48%'],                   gap: '4%',   label: '2 Columns' },
+                    '3even':     { cols: 3, widths: ['31%','31%','31%'],             gap: '3.5%', label: '3 Even' },
+                    '3uneven':   { cols: 3, widths: ['48%','23%','23%'],             gap: '3%',   label: '3 Uneven' },
+                    '4even':     { cols: 4, widths: ['23.5%','23.5%','23.5%','23.5%'], gap: '3%', label: '4 Even' },
+                  };
+                  const cfg = layoutConfigs[layout] || layoutConfigs['3uneven'];
+                  const imgKeys  = ['image1','image2','image3','image4'];
+                  const noteKeys = ['notes1','notes2','notes3','notes4'];
+
+                  const DiagramCol = ({ imgKey, noteKey, width }) => {
+                    const img = diagramImages[imgKey];
+                    const note = diagramImages[noteKey] || '';
+                    return (
+                      <div style={{ width, position: 'relative', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+                        {img ? (
+                          <div className="relative w-full flex-1" style={{ minHeight: 0, overflow: 'hidden' }}>
+                            <img src={img} alt="Diagram" style={{ width: '100%', height: '100%', maxHeight: '100%', objectFit: 'contain', display: 'block' }} />
+                            <button
+                              onClick={() => setDiagramImages({...diagramImages, [imgKey]: null})}
+                              className="no-print absolute top-0 right-0 bg-red-500 text-white text-xs px-2 py-1 rounded hover:bg-red-600"
+                            >×</button>
                           </div>
-                        </div>
-                      )}
-                    </div>
-                    
-                    {/* COLUMN 2: Small diagram (20%) */}
-                    <div style={{ width: '20%', position: 'relative', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-                      {diagramImages.image2 ? (
-                        <div className="relative w-full flex-1" style={{ minHeight: 0, overflow: 'hidden' }}>
-                          <img src={diagramImages.image2} alt="Diagram 2" style={{ width: '100%', height: '100%', maxHeight: '100%', objectFit: 'contain', display: 'block' }} />
-                          <button
-                            onClick={() => setDiagramImages({...diagramImages, image2: null})}
-                            className="no-print absolute top-0 right-0 bg-red-500 text-white text-xs px-1 py-0 rounded hover:bg-red-600" style={{ fontSize: '10px' }}
-                          >
-                            ×
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="flex-1 flex flex-col bg-gray-50 rounded p-1 no-print">
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={async (e) => {
-                              const file = e.target.files[0];
-                              if (file) {
-                                try {
-                                  const compressedImage = await compressImage(file);
-                                  setDiagramImages({...diagramImages, image2: compressedImage});
-                                } catch (error) {
-                                  console.error('Error compressing image:', error);
-                                  alert('Error processing image. Please try a different image.');
-                                }
-                              }
-                            }}
-                            className="no-print w-full text-xs mb-1"
-                          />
-                          <div 
-                            style={{ fontSize: '8px', lineHeight: '1.2' }} 
-                            className="flex-1 text-gray-600 border border-gray-300 rounded p-1 bg-white"
-                            contentEditable
-                            suppressContentEditableWarning
-                            onPaste={async (e) => {
-                              const items = e.clipboardData.items;
-                              for (let i = 0; i < items.length; i++) {
-                                if (items[i].type.indexOf('image') !== -1) {
-                                  e.preventDefault();
-                                  const blob = items[i].getAsFile();
+                        ) : (
+                          <div className="flex-1 flex flex-col bg-gray-50 rounded p-1">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="no-print w-full text-xs mb-1"
+                              onChange={async (e) => {
+                                const file = e.target.files[0];
+                                if (file) {
                                   try {
-                                    const compressedImage = await compressImage(blob);
-                                    setDiagramImages({...diagramImages, image2: compressedImage});
-                                  } catch (error) {
-                                    console.error('Error compressing pasted image:', error);
-                                  }
-                                  break;
+                                    const compressed = await compressImage(file);
+                                    setDiagramImages({...diagramImages, [imgKey]: compressed});
+                                  } catch(err) { alert('Error processing image.'); }
                                 }
-                              }
-                            }}
-                          >
-                            Paste...
+                              }}
+                            />
+                            <div
+                              style={{ fontSize: '8px', lineHeight: '1.3', flex: 1 }}
+                              className="text-gray-600 border border-gray-300 rounded p-1 bg-white"
+                              contentEditable
+                              suppressContentEditableWarning
+                              onBlur={(e) => setDiagramImages({...diagramImages, [noteKey]: e.currentTarget.innerText})}
+                              onPaste={async (e) => {
+                                const items = e.clipboardData.items;
+                                for (let i = 0; i < items.length; i++) {
+                                  if (items[i].type.indexOf('image') !== -1) {
+                                    e.preventDefault();
+                                    const blob = items[i].getAsFile();
+                                    try {
+                                      const compressed = await compressImage(blob);
+                                      setDiagramImages({...diagramImages, [imgKey]: compressed});
+                                    } catch(err) {}
+                                    break;
+                                  }
+                                }
+                              }}
+                              dangerouslySetInnerHTML={{ __html: note || (imgKey === 'image1' ? 'Paste image or notes...' : 'Paste...') }}
+                            />
                           </div>
-                        </div>
-                      )}
-                    </div>
-                    
-                    {/* COLUMN 3: Small diagram (20%) */}
-                    <div style={{ width: '20%', position: 'relative', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-                      {diagramImages.image3 ? (
-                        <div className="relative w-full flex-1" style={{ minHeight: 0, overflow: 'hidden' }}>
-                          <img src={diagramImages.image3} alt="Diagram 3" style={{ width: '100%', height: '100%', maxHeight: '100%', objectFit: 'contain', display: 'block' }} />
+                        )}
+                      </div>
+                    );
+                  };
+
+                  return (
+                    <div className="mt-2" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', flex: 1, minHeight: 0 }}>
+                      {/* Layout selector — no-print */}
+                      <div className="no-print mb-1" style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', alignItems: 'center' }}>
+                        <span style={{ fontSize: '9px', color: '#666', marginRight: '2px' }}>Layout:</span>
+                        {Object.entries(layoutConfigs).map(([key, val]) => (
                           <button
-                            onClick={() => setDiagramImages({...diagramImages, image3: null})}
-                            className="no-print absolute top-0 right-0 bg-red-500 text-white text-xs px-1 py-0 rounded hover:bg-red-600" style={{ fontSize: '10px' }}
-                          >
-                            ×
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="flex-1 flex flex-col bg-gray-50 rounded p-1 no-print">
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={async (e) => {
-                              const file = e.target.files[0];
-                              if (file) {
-                                try {
-                                  const compressedImage = await compressImage(file);
-                                  setDiagramImages({...diagramImages, image3: compressedImage});
-                                } catch (error) {
-                                  console.error('Error compressing image:', error);
-                                  alert('Error processing image. Please try a different image.');
-                                }
-                              }
+                            key={key}
+                            onClick={() => setDiagramImages({...diagramImages, layout: key})}
+                            style={{
+                              fontSize: '8px',
+                              padding: '1px 5px',
+                              borderRadius: '3px',
+                              border: '1px solid #ccc',
+                              backgroundColor: layout === key ? '#374151' : '#f9fafb',
+                              color: layout === key ? '#fff' : '#374151',
+                              cursor: 'pointer',
+                              fontWeight: layout === key ? 'bold' : 'normal'
                             }}
-                            className="no-print w-full text-xs mb-1"
-                          />
-                          <div 
-                            style={{ fontSize: '8px', lineHeight: '1.2' }} 
-                            className="flex-1 text-gray-600 border border-gray-300 rounded p-1 bg-white"
-                            contentEditable
-                            suppressContentEditableWarning
-                            onPaste={async (e) => {
-                              const items = e.clipboardData.items;
-                              for (let i = 0; i < items.length; i++) {
-                                if (items[i].type.indexOf('image') !== -1) {
-                                  e.preventDefault();
-                                  const blob = items[i].getAsFile();
-                                  try {
-                                    const compressedImage = await compressImage(blob);
-                                    setDiagramImages({...diagramImages, image3: compressedImage});
-                                  } catch (error) {
-                                    console.error('Error compressing pasted image:', error);
-                                  }
-                                  break;
-                                }
-                              }
-                            }}
-                          >
-                            Paste...
-                          </div>
-                        </div>
-                      )}
+                          >{val.label}</button>
+                        ))}
+                      </div>
+                      {/* Column area */}
+                      <div style={{ display: 'flex', gap: cfg.gap, flexGrow: 1, minHeight: 0 }}>
+                        {cfg.widths.map((w, i) => (
+                          <DiagramCol key={i} imgKey={imgKeys[i]} noteKey={noteKeys[i]} width={w} />
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                </div>
-                
-                {/* Bottom: MSHSL Logo + Creator Credit — always pinned to bottom of page 2 */}
+                  );
+                })()}
+
+
+                                {/* Bottom: MSHSL Logo + Creator Credit — always pinned to bottom of page 2 */}
                 <div style={{ flexShrink: 0, paddingBottom: '4pt' }}>
                   {/* MSHSL Boys Hockey Logo */}
                   <div style={{ textAlign: 'center', marginTop: '8px', marginBottom: '4px', display: 'flex', justifyContent: 'center' }}>
