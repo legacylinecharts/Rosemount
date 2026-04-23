@@ -3,12 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Legacy Line Charts v20.5</title>
+    <title>Legacy Line Charts v30.0</title>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
+    <style>
+      @font-face {
+        font-family: 'JerseyM54';
+        src: url('data:font/truetype;base64,AAEAAAAMAIAAAwBAT1MvMlX2nD8AAAFIAAAAVmNtYXARwwohAAADLAAAAkBnYXNw//8AAwAAG/gAAAAIZ2x5ZjCxygUAAAY0AAAOpGhlYWT2BX5qAAAAzAAAADZoaGVhDg8E8gAAAQQAAAAkaG10eC7mEgwAAAGgAAABjGtlcm7xxvqFAAAU2AAAAlJsb2NhmMichgAABWwAAADIbWF4cABnABcAAAEoAAAAIG5hbWWHatUvAAAXLAAAA91wb3N0CO0KyAAAGwwAAADpAAEAAAABAAAFaDp/Xw889QALCAAAAAAAx3dpWAAAAADJdco0AEb/wAW0BiMAAAAGAAEAAAAAAAAAAQAAB9D+TgBDBfoARgBGBbQAAQAAAAAAAAAAAAAAAAAAAGMAAQAAAGMAFwADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABA48BkAAFAAgFmgUzAAABGwWaBTMAAAPRAGYCEgAAAgAFAAAAAAAAAIAAAKdQAABKAAAAAAAAAABNNTQgAEAAIAN+B9D+TgEzB9ABsiAAARFBAAAAAAADpgAAAIwAAACMAAAB9AAAAIwAAACMAAAAjAAAA/YARgCMAAAAjAAAAIwAAARZAAAETAAAAIwAAACMAAAAjAAAAIwAAAGuAEYAjAAABAYARgIBAEYD+gBGA/sARgRYAEYD8ABGA/gARgQMAEYD+wBGA/wARgCMAAAAjAAAAIwAAACMAAAAjAAAAIwAAACMAAAEmABGA/sARgQIAEYEEgBGA4EARgN7AEYECwBGBBkARgGvAEYD2ABGBCkARgNbAEYEygBGBCIARgQcAEYD9wBGBBwARgQzAEYD9QBGA+8ARgQVAEYEcwBGBfoARgR4AEYEcwBGA88ARgCMAAAAjAAAAIwAAACMAAAAjAAAAIwAAASYAEYD+wBGBAgARgQSAEYDgQBGA3sARgQLAEYEGQBGAa8ARgPYAEYEKQBGA1sARgTKAEYEIgBGBBwARgP3AEYEHABGBDMARgP1AEYD7wBGBBUARgRzAEYF+gBGBHgARgRzAEYDzwBGA/wARgPwAAAD8ABGBEwAAAPYAAAAAAADAAAAAwAAABwAAQAAAAAAVAADAAEAAAAcAAQAOAAAAAoACAACAAIAfgCgAK0Dfv//AAAAIACgAK0Dfv///+P/Y/9j/KAAAQAAAAAAAAAAAAAABgHsAAAAAADxAAEAAAAAAAAAAAAAAAAAAAABAAIAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAADAAQABQAGAAcACAAJAAoACwAMAA0ADgAPABAAEQASABMAFAAVABYAFwAYABkAGgAbABwAHQAeAB8AIAAhACIAIwAkACUAJgAnACgAKQAqACsALAAtAC4ALwAwADEAMgAzADQANQA2ADcAOAA5ADoAOwA8AD0APgA/AEAAQQBCAEMARABFAEYARwBIAEkASgBLAEwATQBOAE8AUABRAFIAUwBUAFUAVgBXAFgAWQBaAFsAXABdAF4AXwBgAGEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACYAJgAmACYAJgAmACYAJgAmACYANAA0AFAAYgCEAKwAzgDwARYBLgFcAYIBggGCAYIBggGCAYIBggGgAcYB5AH+AhgCMAJSAmwCegKQAqwCvALYAvIDDgMqA0oDagOSA6YDvgPcA/wEGgQyBEoESgRKBEoESgRKBEoEaASOBKwExgTgBPgFGgU0BUIFWAV0BYQFoAW6BdYF8gYSBjIGWgZuBoYGpAbEBuIG+gcSBzIHMgdSB1IHUgABAEYAAAOwBiMAEwAAEzchFxUhNSEVAREHISc1IRUhNQFGugH0vP7Y/uACSLz+DLoBJgEh/bkFf6Sk/X/S/lj+HqWk/X/bAZ8AAAAAAQBGAAABaAEiAAMAADMRIRFGASIBIv7eAAAAAAIARgAAA8AGIwAHAAsAACUHIScRNyEXAREhEQPAvP36uLwCArz+3v7KpKSkBNqlpfukA9/8IQAAAQBGAAABuwYjAAYAACkBESMRNzMBu/7eU7PCBL4BIkMAAAAAAQBGAAADtAYjABEAAAEHIREhESERNyERIRUhNTchFwO0v/5zAkz8krsBkf7Z/tu7Afm6AyWl/qL+3gL/pAFedvSkpAABAEYAAAO1BiMAFgAAJQchJzUhFSERIREhESEVITU3IRcRBxcDtbr+BLkBIgEq/sIBPv7W/t67Afq6b2+kpKT9fwFeASMBXnbzpaX+HYqJAAIARgAABBIGIwACAA8AAAEzEQEnASERMxEjESE1MxEB28T+X7gCWQEiUVH+3QECgAFY/YakBCH8Xf7e/qIwAS4AAAAAAQBGAAIDqgYjABEAACUHISc1IRUhESEnESERIRUhFwOqu/4QuQEiAR/+eLkDWP3LAYe6pqSk+38ByqQCk/7e86MAAAACAEYAAAOyBiMADgASAAAlByEnETchFxUhNSERIRcBESERA7K6/gi6uAH3uv7d/twBkLr+2f7dpKSkBNqlpfN2/qKj/iIBXv6iAAAAAQBGAAADxgYjAAgAAAkBIQEhFSERIQPG/mn+0AGH/uL+3gMqBXX6iwUBdgGYAAAAAwBGAAADtQYjAAMABwAVAAABESERAREhEQUHIScRNycRNyEXEQcXApL+1gEq/tYCTbr+Bbpvb7oB+7pxcQOjAV7+ov1/AV7+on6kpAHkiYoB46Wl/h2KiQAAAAACAEYAAAO2BiMADgASAAAlByEnNSEVIREhJxE3IRcBESERA7a6/gy6ARsBK/5rubkB+7z+3v7VpKSk/X8BXqQCWqWm/iYBXv6iAAAAAgBGAAAEUgYjAAcACgAAIQMhAyEBIQkBCwEDKkb+0Eb+2AE6AZgBOv5YXl4BXv6iBiP53QKAAdb+KgAAAwBGAAADtQYjAAMABwAQAAABIREhESERIQEHIREhFxEHFwFoASr+1gEq/tYCTbr9SwK1unBwA6MBXvwhAV7+JKQGI6X+HYiLAAAAAAEARgAAA8IGIwAPAAAlByEnETchFxUhNSERITUhA8K+/fu5uQIFvv7e/sgBOAEipKSkBNqlpvJ2/CF/AAIARgAAA8wGIwAFAAkAAAEXEQchEQERIREDELy8/TYCZP6/BiOm+yilBiP6/wPf/CEAAAABAEYAAAM7BiMACwAAKQERIREhESERIREhAzv9CwLv/jMBjf5zAdMGI/7e/qL+3f6iAAAAAQBGAAADNQYjAAkAAAEhESERIREhESEDNf40AYz+dP7dAu8FAf6i/t39gAYjAAAAAQBGAAADxQYjABEAACUHIScRNyEXFSE1IREhESMRIQPFvP32ubwCB7z+3v7GATrGAeikpKQE2qWl9nn8IQFeASMAAAABAEYAAAPTBiMACwAAKQERIREhESERIREhA9P+3v63/t4BIgFJASICgP2ABiP9gAKAAAAAAQBGAAABaQYjAAMAACkBESEBaf7dASMGIwAAAAEARgAAA5IGIwAJAAAlByEnNSEVIREhA5K7/im6ASIBCAEipKSk/X8FAQAAAQBGAAAD4wYjAAoAAAkCIQERIREhEQED4/58AYT+vf7I/t4BIgE4BiP87vzvAoD9gAYj/YACgAABAEYAAAMVBiMABQAAKQERIREhAxX9MQEjAawGI/r/AAEARgAABIQGIwALAAApARELAREhESEbASEEhP7d/fz+3gEi/P0BIwN1/eQCHPyLBiP95AIcAAAAAQBGAAAD3AYjAAoAACEBESERIQERIREXAqT+w/7fATcBPgEgAQM3/MkGI/zIAzj53wIAAAIARgAAA9YGIwAHAAsAACUHIScRNyEXAREhEQPWu/3kubkCHLv+3f61pKSkBNqlpfukA9/8IQAAAgBGAAADsQYjAAcACwAAAQchESERIRcBESERA7G8/nP+3gKvvP7e/tkCvKf96wYjpv26Acr+NgACAEb/wAPWBiMAAwAOAAABESEREycjJxE3IRcRBxcCs/61ozXYuLoCG7u1OAEiA9/8If6eQKQE2qWl+yefRgAAAgBGAAAD7QYjAAoADgAAKQEDIxEhESEXEQcBIREhA+3+yfdW/t0CubnG/ncBLf7TAoD9gAYjpf2/uQEfAV8AAAEARgAAA68GIwAVAAAlByEnNSEVIREhJxE3IRcVITUhESEXA6+5/gu7ASIBJf50u7sB9bn+3v7bAY65pKSk/X8BXqUCWaWk9Hb+oqUAAAAAAQBGAAADqQYjAAcAAAEhESERIREhA6n+4P7d/uADYwUB+v8FAQEiAAEARgAAA88GIwAJAAAlByEnESERIREhA8++/e+6ASIBRQEipaWkBX/6/wUBAAAAAAEARgAABC0GIwAKAAABGgETIQEhASEaAQI6QUs+ASn+ov7W/qEBKj1LApkBIwFUARP53QYj/uz+rQAAAAEARgAABbQGIwAMAAAJASELASEBIRsBMxsBBbT++f7YiIn+2P76ASl3n/CedwYj+d0Cp/1ZBiP83QMj/NwDJAABAEYAAAQyBiMACwAAKQELASEJASEbASEBBDL+xLq7/sUBWP66ATupqQE8/rkBtf5LAygC+/52AYr9BQABAEYAAAQtBiMACAAAAREhEQEhGwEhAsj+2v6kASrGwwE0AkP9vQJFA979twJJAAABAEYAAAOJBiMACQAAKQE1ASERIRUBIQOJ/L0B0v5WAxj+OgHJgwR/ASGe+50AAAACAEYAAARSBiMABwAKAAAhAyEDIQEhCQELAQMqRv7QRv7YAToBmAE6/lheXgFe/qIGI/ndAoAB1v4qAAADAEYAAAO1BiMAAwAHABAAAAEhESERIREhAQchESEXEQcXAWgBKv7WASr+1gJNuv1LArW6cHADowFe/CEBXv4kpAYjpf4diIsAAAAAAQBGAAADwgYjAA8AACUHIScRNyEXFSE1IREhNSEDwr79+7m5AgW+/t7+yAE4ASKkpKQE2qWm8nb8IX8AAgBGAAADzAYjAAUACQAAARcRByERAREhEQMQvLz9NgJk/r8GI6b7KKUGI/r/A9/8IQAAAAEARgAAAzsGIwALAAApAREhESERIREhESEDO/0LAu/+MwGN/nMB0wYj/t7+ov7d/qIAAAABAEYAAAM1BiMACQAAASERIREhESERIQM1/jQBjP50/t0C7wUB/qL+3f2ABiMAAAABAEYAAAPFBiMAEQAAJQchJxE3IRcVITUhESERIxEhA8W8/fa5vAIHvP7e/sYBOsYB6KSkpATapaX2efwhAV4BIwAAAAEARgAAA9MGIwALAAApAREhESERIREhESED0/7e/rf+3gEiAUkBIgKA/YAGI/2AAoAAAAABAEYAAAFpBiMAAwAAKQERIQFp/t0BIwYjAAAAAQBGAAADkgYjAAkAACUHISc1IRUhESEDkrv+KboBIgEIASKkpKT9fwUBAAABAEYAAAPjBiMACgAACQIhAREhESERAQPj/nwBhP69/sj+3gEiATgGI/zu/O8CgP2ABiP9gAKAAAEARgAAAxUGIwAFAAApAREhESEDFf0xASMBrAYj+v8AAQBGAAAEhAYjAAsAACkBEQsBESERIRsBIQSE/t39/P7eASL8/QEjA3X95AIc/IsGI/3kAhwAAAABAEYAAAPcBiMACgAAIQERIREhAREhERcCpP7D/t8BNwE+ASABAzf8yQYj/MgDOPnfAgAAAgBGAAAD1gYjAAcACwAAJQchJxE3IRcBESERA9a7/eS5uQIcu/7d/rWkpKQE2qWl+6QD3/whAAACAEYAAAOxBiMABwALAAABByERIREhFwERIREDsbz+c/7eAq+8/t7+2QK8p/3rBiOm/boByv42AAIARv/AA9YGIwADAA4AAAERIRETJyMnETchFxEHFwKz/rWjNdi4ugIbu7U4ASID3/wh/p5ApATapaX7J59GAAACAEYAAAPtBiMACgAOAAApAQMjESERIRcRBwEhESED7f7J91b+3QK5ucb+dwEt/tMCgP2ABiOl/b+5AR8BXwAAAQBGAAADrwYjABUAACUHISc1IRUhESEnETchFxUhNSERIRcDr7n+C7sBIgEl/nS7uwH1uf7e/tsBjrmkpKT9fwFepQJZpaT0dv6ipQAAAAABAEYAAAOpBiMABwAAASERIREhESEDqf7g/t3+4ANjBQH6/wUBASIAAQBGAAADzwYjAAkAACUHIScRIREhESEDz77977oBIgFFASKlpaQFf/r/BQEAAAAAAQBGAAAELQYjAAoAAAEaARMhASEBIRoBAjpBSz4BKf6i/tb+oQEqPUsCmQEjAVQBE/ndBiP+7P6tAAAAAQBGAAAFtAYjAAwAAAkBIQsBIQEhGwEzGwEFtP75/tiIif7Y/voBKXef8J53BiP53QKn/VkGI/zdAyP83AMkAAEARgAABDIGIwALAAApAQsBIQkBIRsBIQEEMv7Eurv+xQFY/roBO6mpATz+uQG1/ksDKAL7/nYBiv0FAAEARgAABC0GIwAIAAABESERASEbASECyP7a/qQBKsbDATQCQ/29AkUD3v23AkkAAAEARgAAA4kGIwAJAAApATUBIREhFQEhA4n8vQHS/lYDGP46AcmDBH8BIZ77nQAAAAEARgAAA7YGIwAPAAABFSERIREBNSEVITU3IRcRAWkCTfyQAk7+2P7avQH4uwGfff7eAhgCRKV29KSk/mQAAAABAEYAAAOqBiMAEAAAJQchJzUhFSERIREhESEVIRcDqrr+DrgBIgEg/b4DWP3KAYm5pKSk/X8B7wMS/t7NpAAAAAABAAACTgABAGABgAAGAMAAJAAm/90AJAAq/90AJAAt/90AJAAy/90AJAA0/90AJAA2/90AJAA3/u0AJAA4/90AJAA5/u0AJAA6/wEAJAA8/tkAJABG/90AJABK/90AJABN/90AJABS/90AJABU/90AJABW/90AJABX/u0AJABY/90AJABZ/u0AJABa/wEAJABc/tkAJQAk/9gAJgAk/9gAJwAk/9gAKQAk/wsAKQAt/40AKQBN/40AKgAk/9gALQAk/9gALwA3/tQALwA5/tQALwA6/x8ALwA8/okALwBX/tQALwBZ/tQALwBa/x8ALwBc/okAMgAk/9gAMwAk/1gAMwAt/7UAMwBN/7UANAAk/9gANgAk/9gANwAk/u0ANwAt/tQANwBE/u0ANwBN/tQAOAAk/9gAOQAk/u0AOQAt/xUAOQBN/xUAOgAk/vIAOgAt/zgAOgBN/zgAPAAk/tkAPAAt/o4APABN/o4ARAA3/u0ARABX/u0ARQAk/9gARgAk/9gARwAk/9gASQAk/wsASQAt/40ASQBN/40ASgAk/9gATQAk/9gATwA3/tQATwA5/tQATwA6/x8ATwA8/okATwBX/tQATwBZ/tQATwBa/x8ATwBc/okAUgAk/9gAUwAk/1gAUwAt/7UAUwBN/7UAVAAk/9gAVgAk/9gAVwAk/u0AVwAt/tQAVwBE/u0AVwBN/tQAWAAk/9gAWQAk/u0AWQAt/xUAWQBN/xUAWgAk/vIAWgAt/zgAWgBN/zgAXAAk/tkAXAAt/o4AXABN/o4AAAAAACgB5gABAAAAAAAAABYAAAABAAAAAAABAAoAFgABAAAAAAACAAcALQABAAAAAAADABcAFgABAAAAAAAEAAoAFgABAAAAAAAFABoANAABAAAAAAAGAAkATgADAAEEAwACAAwAVwADAAEEBQACABAAZwADAAEEBgACAAwAdwADAAEEBwACABAAgwADAAEECAACABAAkwADAAEECQAAACwAowADAAEECQABABQAzwADAAEECQACAA4A/QADAAEECQADAC4AzwADAAEECQAEABQAzwADAAEECQAFADQBCwADAAEECQAGABIBPwADAAEECQAIAB4BUQADAAEECQAJAB4BbwADAAEECgACAAwAVwADAAEECwACABABjQADAAEEDAACAAwAVwADAAEEDgACAAwBnQADAAEEEAACAA4BrQADAAEEEwACABIBuwADAAEEFAACAAwAVwADAAEEFQACABAAVwADAAEEFgACAAwAVwADAAEEGQACAA4BzQADAAEEGwACABABnQADAAEEHQACAAwAVwADAAEEHwACAAwAVwADAAEEJAACAA4B2wADAAEELQACAA4B6QADAAEICgACAAwAVwADAAEIFgACAAwAVwADAAEMCgACAAwAVwADAAEMDAACAAwAV6kgMjAwOSBNb2hhbW1lZCBSYWhtYW5KZXJzZXkgTTU0OlZlcnNpb24gMS4wMVJlZ3VsYXJWZXJzaW9uIDEuMDEgSnVuZSAyMSwgMjAxMEplcnNleU01NABOAG8AcgBtAGEAbABuAHkAbwBiAHkBDQBlAGoAbgDpAG4AbwByAG0AYQBsAFMAdABhAG4AZABhAHIAZAOaA7EDvQO/A70DuQO6A6wAqQAgADIAMAAwADkAIABNAG8AaABhAG0AbQBlAGQAIABSAGEAaABtAGEAbgBKAGUAcgBzAGUAeQAgAE0ANQA0ADoAVgBlAHIAcwBpAG8AbgAgADEALgAwADEAUgBlAGcAdQBsAGEAcgBWAGUAcgBzAGkAbwBuACAAMQAuADAAMQAgAEoAdQBuAGUAIAAyADEALAAgADIAMAAxADAASgBlAHIAcwBlAHkATQA1ADQATQA1ADQAIAAoAGoAdQBzAHQAbQBlADUANABzACkATQBvAGgAYQBtAG0AZQBkACAAUgBhAGgAbQBhAG4ATgBvAHIAbQBhAGEAbABpAE4AbwByAG0A4QBsAG4AZQBOAG8AcgBtAGEAbABlAFMAdABhAG4AZABhAGEAcgBkBB4EMQRLBEcEPQRLBDkATgBhAHYAYQBkAG4AbwBBAHIAcgB1AG4AdABhAAAAAAIAAAAAAAD/JwCWAAAAAAAAAAAAAAAAAAAAAAAAAAAAYwAAAAEAAgADAAQABQAGAAcACAAJAAoACwAMAA0ADgAPABAAEQASABMAFAAVABYAFwAYABkAGgAbABwAHQAeAB8AIAAhACIAIwAkACUAJgAnACgAKQAqACsALAAtAC4ALwAwADEAMgAzADQANQA2ADcAOAA5ADoAOwA8AD0APgA/AEAAQQBCAEMARABFAEYARwBIAEkASgBLAEwATQBOAE8AUABRAFIAUwBUAFUAVgBXAFgAWQBaAFsAXABdAF4AXwBgAGEBAgAAAAAAAAAB//8AAg==') format('truetype');
+      }
+    </style>
     <style>
         * {
             font-family: 'Arial Narrow', Arial, sans-serif;
@@ -385,6 +391,31 @@
 
         const HockeyLinesChart = () => {
           // Helper function to determine if a color is dark
+          // Jersey number color helper
+          // Returns { fill, outline } — darker color fills, lighter outlines
+          // Ensures outline is visible against white card background
+          const getJerseyColors = (primary, secondary) => {
+            const brightness = (hex) => {
+              const h = (hex || '#000').replace('#','');
+              if (h.length !== 6) return 0;
+              const r = parseInt(h.slice(0,2),16), g = parseInt(h.slice(2,4),16), b = parseInt(h.slice(4,6),16);
+              return (r * 299 + g * 587 + b * 114) / 1000;
+            };
+            const darkenColor = (hex, amount) => {
+              const h = hex.replace('#','');
+              const r = Math.max(0, parseInt(h.slice(0,2),16) - amount);
+              const g = Math.max(0, parseInt(h.slice(2,4),16) - amount);
+              const b = Math.max(0, parseInt(h.slice(4,6),16) - amount);
+              return '#' + [r,g,b].map(v => v.toString(16).padStart(2,'0')).join('');
+            };
+            const bp = brightness(primary), bs = brightness(secondary);
+            let fill = bp <= bs ? primary : secondary;
+            let outline = bp <= bs ? secondary : primary;
+            // If outline is too light against white card, darken it
+            if (brightness(outline) > 210) outline = darkenColor(outline, 60);
+            return { fill, outline };
+          };
+
           const isColorDark = (hexColor) => {
             if (!hexColor) return false;
             const hex = hexColor.replace('#', '');
@@ -1068,7 +1099,7 @@
             const exportObj = {
               _exportInfo: {
                 exportDate: new Date().toISOString(),
-                version: '20.5',
+                version: '30.0',
                 teamName: myTeamSetup.teamName,
                 description: 'Full team configuration for subscriber site build'
               },
@@ -2891,7 +2922,7 @@
             const statFontSize = `${8 * fontScale}pt`;
             const nameFontSize = `${20 * fontScale}pt`;
             const infoFontSize = statFontSize;
-            const pronunciationFontSize = `${12.5 * fontScale}pt`;
+            const pronunciationFontSize = `${9 * fontScale}pt`;
             
             React.useEffect(() => {
               const resizeText = (element, maxSize, minSize = 8) => {
@@ -2936,7 +2967,7 @@
                 // Clear transform before measuring
                 pronunciationRef.current.style.transform = '';
                 // Only shrink if text WIDTH exceeds the frame — never shrink due to height
-                let fontSize = isPreview ? 10 * 0.3125 : 10;
+                let fontSize = isPreview ? 9 * 0.3125 : 9;
                 const minSize = isPreview ? 2.5 : 6;
                 pronunciationRef.current.style.fontSize = `${fontSize}pt`;
                 while (pronunciationRef.current.scrollWidth > pronunciationRef.current.offsetWidth && fontSize > minSize) {
@@ -2987,20 +3018,33 @@
                     width: '2px',
                     backgroundColor: '#222222'
                   }} />
-                  {/* Number — normal size, original resize behavior */}
-                  <div
-                    ref={numberRef}
-                    style={{
-                      fontWeight: 'bold',
-                      lineHeight: '0.9',
-                      textAlign: 'center',
-                      width: '100%',
-                      overflow: 'hidden',
-                      marginBottom: '0px'
-                    }}
-                  >
-                    {player.number}
-                  </div>
+                  {/* Number — Jersey M54 with team colors + offset shadow */}
+                  {(() => {
+                    const { fill, outline } = getJerseyColors(myTeamSetup.colors.primary, myTeamSetup.colors.secondary);
+                    const isDouble = (player.number || '').toString().length >= 2;
+                    return (
+                      <div
+                        ref={numberRef}
+                        style={{
+                          fontFamily: "'JerseyM54', 'Arial Narrow', Arial, sans-serif",
+                          lineHeight: '0.9',
+                          textAlign: 'center',
+                          width: '100%',
+                          overflow: 'hidden',
+                          marginBottom: '0px',
+                          color: fill,
+                          WebkitTextStroke: `${isPreview ? '0.5px' : '1.5px'} ${outline}`,
+                          paintOrder: 'stroke fill',
+                          textShadow: isPreview
+                            ? `${-0.3}px ${0.3}px 0 ${outline}, ${-0.6}px ${0.6}px 0 ${outline}, ${-0.9}px ${0.9}px 0 ${outline}`
+                            : `-1px 1px 0 ${outline}, -2px 2px 0 ${outline}, -3px 3px 0 ${outline}`,
+                          letterSpacing: isDouble ? (isPreview ? '0.6px' : '2px') : '0px'
+                        }}
+                      >
+                        {player.number}
+                      </div>
+                    );
+                  })()}
 
                   {/* Logos — zero spacing above and below, between number and pronunciation */}
                   {hasLogos && (
@@ -3102,7 +3146,7 @@
                         whiteSpace: 'nowrap',
                         overflow: 'hidden'
                       }}>
-                        <span>25-26: GP {stats.gp}</span>
+                        <span>{getSeasonYears().season1}: GP {stats.gp}</span>
                         <span>Pts.{stats.g}-{stats.a}--{stats.pts}</span>
                         {showPlusMinus && <span>+/- {formatPlusMinus(stats.plusMinus)}</span>}
                       </div>
@@ -3163,7 +3207,7 @@
                         whiteSpace: 'nowrap',
                         overflow: 'hidden'
                       }}>
-                        <span>25-26: MIN {goalieStats.min}</span>
+                        <span>{getSeasonYears().season1}: MIN {goalieStats.min}</span>
                         <span>GAA {goalieStats.gaa.toFixed(2)}</span>
                       </div>
                       
@@ -4254,7 +4298,7 @@
                       boxSizing: 'border-box'
                     }}>
                       {myTeamSetup.logo && (
-                        <img src={myTeamSetup.logo} alt="Team" className="object-contain" style={{ maxHeight: '77px', maxWidth: '100%' }} />
+                        <img src={myTeamSetup.logo} alt="Team" className="object-contain" style={{ maxHeight: '77px', backgroundColor: 'white', maxWidth: '100%', backgroundColor: 'white' }} />
                       )}
                     </div>
                     <div className="flex flex-col" style={{ overflow: 'hidden', minHeight: 0 }}>
@@ -4356,7 +4400,7 @@
                       boxSizing: 'border-box'
                     }}>
                       {opponentLogo && (
-                        <img src={opponentLogo} alt="Opponent" className="object-contain" style={{ maxHeight: '77px', maxWidth: '100%' }} />
+                        <img src={opponentLogo} alt="Opponent" className="object-contain" style={{ maxHeight: '77px', backgroundColor: 'white', maxWidth: '100%', backgroundColor: 'white' }} />
                       )}
                     </div>
                     <div className="flex flex-col" style={{ overflow: 'hidden', minHeight: 0 }}>
@@ -4733,7 +4777,7 @@
                           padding: '4px', flexShrink: 0
                         }}>
                           {opponentLogo && (
-                            <img src={opponentLogo} alt="Opp" style={{ maxHeight: '80px', width: '100%', objectFit: 'contain' }} />
+                            <img src={opponentLogo} alt="Opp" style={{ maxHeight: '80px', width: '100%', objectFit: 'contain', backgroundColor: 'white' }} />
                           )}
                         </div>
                         <div style={{ fontSize: 'clamp(12px, 1.4vw, 16px)', fontWeight: '900', color: oc, lineHeight: '1.1' }}>
@@ -5106,17 +5150,17 @@
                     const img = diagramImages[imgKey];
                     const note = diagramImages[noteKey] || '';
                     return (
-                      <div style={{ width, position: 'relative', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+                      <div style={{ width, position: 'relative', display: 'flex', flexDirection: 'column', minHeight: 0, flexShrink: 0 }}>
                         {img ? (
-                          <div className="relative w-full flex-1" style={{ minHeight: 0, overflow: 'hidden' }}>
-                            <img src={img} alt="Diagram" style={{ width: '100%', height: '100%', maxHeight: '100%', objectFit: 'contain', display: 'block' }} />
+                          <div className="relative w-full flex-1 diagram-col-inner" style={{ minHeight: 0, overflow: 'hidden' }}>
+                            <img src={img} alt="Diagram" style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', backgroundColor: 'white' }} />
                             <button
                               onClick={() => setDiagramImages({...diagramImages, [imgKey]: null})}
                               className="no-print absolute top-0 right-0 bg-red-500 text-white text-xs px-2 py-1 rounded hover:bg-red-600"
                             >×</button>
                           </div>
                         ) : (
-                          <div className="flex-1 flex flex-col bg-gray-50 rounded p-1">
+                          <div className="flex-1 flex flex-col bg-gray-50 rounded p-1 no-print">
                             <input
                               type="file"
                               accept="image/*"
@@ -5160,7 +5204,7 @@
                   };
 
                   return (
-                    <div className="mt-2" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', flex: 1, minHeight: 0 }}>
+                    <div className="mt-2 diagram-section" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', flex: 1, minHeight: 0 }}>
                       {/* Layout selector — no-print */}
                       <div className="no-print mb-1" style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', alignItems: 'center' }}>
                         <span style={{ fontSize: '9px', color: '#666', marginRight: '2px' }}>Layout:</span>
@@ -5199,7 +5243,7 @@
                     <img 
                       src="https://cdn2.sportngin.com/attachments/league/c4e7-208998629/MSHSLboyshockey_large_square.png" 
                       alt="MSHSL Boys Hockey" 
-                      style={{ width: '0.75in', height: '0.75in', objectFit: 'contain', display: 'block', margin: '0 auto' }}
+                      style={{ width: '0.75in', height: '0.75in', objectFit: 'contain', display: 'block', margin: '0 auto', backgroundColor: 'white' }}
                     />
                   </div>
                   
@@ -5265,6 +5309,31 @@
                   .print-page-2 > div:last-child {
                     flex-shrink: 1;
                     overflow: hidden;
+                  }
+
+                  /* Diagram section — fills all remaining space above footer */
+                  .print-page-2 {
+                    height: 10.375in !important;
+                  }
+
+                  .print-page-2 .diagram-section {
+                    flex: 1 1 0% !important;
+                    min-height: 0 !important;
+                    overflow: hidden !important;
+                  }
+
+                  .print-page-2 .diagram-section .diagram-col-inner {
+                    position: absolute !important;
+                    top: 0 !important; left: 0 !important;
+                    right: 0 !important; bottom: 0 !important;
+                    overflow: hidden !important;
+                  }
+
+                  .print-page-2 .diagram-section img {
+                    width: 100% !important;
+                    height: 100% !important;
+                    object-fit: contain !important;
+                    display: block !important;
                   }
                 }
                 
