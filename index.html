@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Legacy Line Charts v50.4</title>
+    <title>Legacy Line Charts v50.7</title>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -541,8 +541,8 @@
               teamName: '',
               nickname: '',
               record: { w: 0, l: 0, t: 0 },
-              section: '2A',
-              conference: 'WCC',
+              section: '',
+              conference: '',
               stats: { ppPct: 0, pkPct: 0, gpg: 0, gapg: 0, ppGoals: 0, ppOpp: 0, pkOpp: 0, pkGoalsAllowed: 0 },
               roster: [],
               nextGame: { gameNum: '', opponent: '', date: '', location: '', oppRecord: '', oppSection: '', oppConference: '' },
@@ -1124,7 +1124,10 @@
             } else {
               seasonStartYear = currentYear - 1;
             }
-            
+
+            // Completed seasons = last 3 finished seasons (used in career import labels)
+            const completedStartYear = currentMonth >= 4 ? currentYear - 1 : currentYear - 2;
+
             const short = (y) => `'${String(y).slice(2)}-'${String(y+1).slice(2)}`;
             return {
               season1: short(seasonStartYear),
@@ -1132,7 +1135,10 @@
               season3: short(seasonStartYear - 2),
               season1Full: `${seasonStartYear}-${seasonStartYear + 1}`,
               season2Full: `${seasonStartYear - 1}-${seasonStartYear}`,
-              season3Full: `${seasonStartYear - 2}-${seasonStartYear - 1}`
+              season3Full: `${seasonStartYear - 2}-${seasonStartYear - 1}`,
+              completedSeason1: short(completedStartYear),
+              completedSeason2: short(completedStartYear - 1),
+              completedSeason3: short(completedStartYear - 2)
             };
           };
 
@@ -1153,7 +1159,7 @@
             const exportObj = {
               _exportInfo: {
                 exportDate: new Date().toISOString(),
-                version: '50.4',
+                version: '50.7',
                 teamName: myTeamSetup.teamName,
                 description: 'Full team configuration for subscriber site build'
               },
@@ -1879,7 +1885,7 @@
                     console.log('✓ Found player (tab-separated):', { number, name, position, grade });
                     
                     // Strip (Capt.) or (Capt) or * from names
-                    const cleanName = name.replace(/\s*\(Capt\.?\)/gi, '').replace(/\s*\(Captain\)/gi, '').replace(/\s*\(C\)/gi, '').replace(/\s*\bC\b$/g, '').replace(/\*/g, '').trim();
+                    const cleanName = (() => { const p = name.trim().split(/\s+/); const r = []; for (const t of p) { const tc = t.replace(/\*+$/, ''); if (/[a-z]$/.test(tc)) r.push(tc); else break; } return r.length > 0 ? r.join(' ') : p[0]; })();
                     const nameParts = cleanName.split(' ');
                     const lastName = nameParts[nameParts.length - 1];
                     const firstName = nameParts.slice(0, -1).join(' ');
@@ -2044,7 +2050,7 @@
                     console.log('✓ Found player (concatenated):', { number, name, position, grade, height, weight, shoots, dobYear });
                     
                     // Strip (Capt.) or (Capt) or * from names
-                    const cleanName = name.replace(/\s*\(Capt\.?\)/gi, '').replace(/\s*\(Captain\)/gi, '').replace(/\s*\(C\)/gi, '').replace(/\s*\bC\b$/g, '').replace(/\*/g, '').trim();
+                    const cleanName = (() => { const p = name.trim().split(/\s+/); const r = []; for (const t of p) { const tc = t.replace(/\*+$/, ''); if (/[a-z]$/.test(tc)) r.push(tc); else break; } return r.length > 0 ? r.join(' ') : p[0]; })();
                     const nameParts = cleanName.split(' ');
                     const lastName = nameParts[nameParts.length - 1];
                     const firstName = nameParts.slice(0, -1).join(' ');
@@ -2133,7 +2139,7 @@
                 const normalizedStatsPos = statsPos ? statsPos.split('|')[0] : null;
 
                 // Clean name
-                const cleanName = name.replace(/\s*\(Capt\.?\)/gi, '').replace(/\s*\(Captain\)/gi, '').replace(/\s*\(C\)/gi, '').replace(/\s*\bC\b$/g, '').replace(/\*/g, '').trim();
+                const cleanName = (() => { const p = name.trim().split(/\s+/); const r = []; for (const t of p) { const tc = t.replace(/\*+$/, ''); if (/[a-z]$/.test(tc)) r.push(tc); else break; } return r.length > 0 ? r.join(' ') : p[0]; })();
 
                 if (inSkaterSection) {
                   const player = updatedRoster.find(p =>
@@ -2803,17 +2809,16 @@
                   
                   if (!/^\d+$/.test(number)) continue;
 
-                  // Strip all captain/designation suffixes — coaches use many styles:
-                  // (Capt.), (C), (Captain), *, C at end, leading *
-                  const cleanedName = rawName
-                    .replace(/\s*\(Capt\.?\)/gi, '')
-                    .replace(/\s*\(Captain\)/gi, '')
-                    .replace(/\s*\(C\)/gi, '')
-                    .replace(/\s*\bC\b$/g, '')
-                    .replace(/\*/g, '')
-                    .trim();
-                  
-                  const nameParts = cleanedName.split(/\s+/);
+                  // Extract name: keep tokens that end with a lowercase letter (real name parts)
+                  // Stop at first token ending with non-lowercase (C, A, *, (C), (A), (Capt.) etc.)
+                  const rawParts = rawName.trim().split(/\s+/);
+                  const realParts = [];
+                  for (const part of rawParts) {
+                    const tc = part.replace(/\*+$/, '');
+                    if (/[a-z]$/.test(tc)) { realParts.push(tc); }
+                    else { break; }
+                  }
+                  const nameParts = realParts.length > 0 ? realParts : rawParts;
                   // Use first 3 chars to distinguish siblings (e.g., Jonny vs Joe McCabe)
                   const firstChars = nameParts[0]?.substring(0, 3)?.toUpperCase() || '';
                   const lastName = nameParts[nameParts.length - 1]?.toUpperCase() || '';
@@ -3481,9 +3486,9 @@
                         <div className="space-y-3">
                           <div>
                             <div className="flex items-center justify-between mb-1">
-                              <label className="text-sm font-semibold">{getSeasonYears().season1} Season Legacy Final Player Stats</label>
+                              <label className="text-sm font-semibold">{getSeasonYears().completedSeason1} Season Legacy Final Player Stats</label>
                               <button 
-                                onClick={() => openHelp('careerStats', getSeasonYears().season1)}
+                                onClick={() => openHelp('careerStats', getSeasonYears().completedSeason1)}
                                 className="text-blue-600 hover:text-blue-800 text-xs font-semibold"
                               >
                                 ❓ Help
@@ -3492,7 +3497,7 @@
                             <textarea
                               value={careerStatsImport.lastSeason}
                               onChange={(e) => setCareerStatsImport({...careerStatsImport, lastSeason: e.target.value})}
-                              placeholder={`Paste player stats from ${getSeasonYears().season1} season...`}
+                              placeholder={`Paste player stats from ${getSeasonYears().completedSeason1} season...`}
                               className="w-full border rounded px-3 py-2 font-mono text-xs"
                               rows="3"
                             />
@@ -3500,9 +3505,9 @@
                           
                           <div>
                             <div className="flex items-center justify-between mb-1">
-                              <label className="text-sm font-semibold">{getSeasonYears().season2} Season Legacy Final Player Stats</label>
+                              <label className="text-sm font-semibold">{getSeasonYears().completedSeason2} Season Legacy Final Player Stats</label>
                               <button 
-                                onClick={() => openHelp('careerStats', getSeasonYears().season2)}
+                                onClick={() => openHelp('careerStats', getSeasonYears().completedSeason2)}
                                 className="text-blue-600 hover:text-blue-800 text-xs font-semibold"
                               >
                                 ❓ Help
@@ -3511,7 +3516,7 @@
                             <textarea
                               value={careerStatsImport.twoSeasonsAgo}
                               onChange={(e) => setCareerStatsImport({...careerStatsImport, twoSeasonsAgo: e.target.value})}
-                              placeholder={`Paste player stats from ${getSeasonYears().season2} season...`}
+                              placeholder={`Paste player stats from ${getSeasonYears().completedSeason2} season...`}
                               className="w-full border rounded px-3 py-2 font-mono text-xs"
                               rows="3"
                             />
@@ -3519,7 +3524,7 @@
                           
                           <div>
                             <div className="flex items-center justify-between mb-1">
-                              <label className="text-sm font-semibold">{getSeasonYears().season3} Season Legacy Final Player Stats</label>
+                              <label className="text-sm font-semibold">{getSeasonYears().completedSeason3} Season Legacy Final Player Stats</label>
                               <button 
                                 onClick={() => openHelp('careerStats', getSeasonYears().season3)}
                                 className="text-blue-600 hover:text-blue-800 text-xs font-semibold"
@@ -3530,7 +3535,7 @@
                             <textarea
                               value={careerStatsImport.threeSeasonsAgo}
                               onChange={(e) => setCareerStatsImport({...careerStatsImport, threeSeasonsAgo: e.target.value})}
-                              placeholder={`Paste player stats from ${getSeasonYears().season3} season...`}
+                              placeholder={`Paste player stats from ${getSeasonYears().completedSeason3} season...`}
                               className="w-full border rounded px-3 py-2 font-mono text-xs"
                               rows="3"
                             />
